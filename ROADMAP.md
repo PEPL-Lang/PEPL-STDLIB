@@ -54,28 +54,28 @@
 ## Phase 3: `string` Module
 
 ### 3.1 String Functions (20 functions)
-- [ ] `string.length(s) -> number`
-- [ ] `string.concat(a, b) -> string`
-- [ ] `string.contains(haystack, needle) -> bool`
-- [ ] `string.slice(s, start, end) -> string`
-- [ ] `string.trim(s) -> string`
-- [ ] `string.split(s, delimiter) -> list<string>`
-- [ ] `string.to_upper(s) -> string`
-- [ ] `string.to_lower(s) -> string`
-- [ ] `string.starts_with(s, prefix) -> bool`
-- [ ] `string.ends_with(s, suffix) -> bool`
-- [ ] `string.replace(s, old, new) -> string` — first occurrence only
-- [ ] `string.replace_all(s, old, new) -> string`
-- [ ] `string.pad_start(s, length, pad) -> string`
-- [ ] `string.pad_end(s, length, pad) -> string`
-- [ ] `string.repeat(s, count) -> string`
-- [ ] `string.join(items: list<string>, separator) -> string`
-- [ ] `string.format(template, values: record) -> string` — `{key}` placeholders
-- [ ] `string.from(value: any) -> string`
-- [ ] `string.is_empty(s) -> bool`
-- [ ] `string.index_of(s, sub) -> number` — returns -1 if not found
-- [ ] Unit tests for all functions (empty strings, Unicode, multi-byte)
-- [ ] 100-iteration determinism test
+- [x] `string.length(s) -> number`
+- [x] `string.concat(a, b) -> string`
+- [x] `string.contains(haystack, needle) -> bool`
+- [x] `string.slice(s, start, end) -> string`
+- [x] `string.trim(s) -> string`
+- [x] `string.split(s, delimiter) -> list<string>`
+- [x] `string.to_upper(s) -> string`
+- [x] `string.to_lower(s) -> string`
+- [x] `string.starts_with(s, prefix) -> bool`
+- [x] `string.ends_with(s, suffix) -> bool`
+- [x] `string.replace(s, old, new) -> string` — first occurrence only
+- [x] `string.replace_all(s, old, new) -> string`
+- [x] `string.pad_start(s, length, pad) -> string`
+- [x] `string.pad_end(s, length, pad) -> string`
+- [x] `string.repeat(s, count) -> string`
+- [x] `string.join(items: list<string>, separator) -> string`
+- [x] `string.format(template, values: record) -> string` — `{key}` placeholders
+- [x] `string.from(value: any) -> string`
+- [x] `string.is_empty(s) -> bool`
+- [x] `string.index_of(s, sub) -> number` — returns -1 if not found
+- [x] Unit tests for all functions (empty strings, Unicode, multi-byte)
+- [x] 100-iteration determinism test
 
 ---
 
