@@ -4,6 +4,8 @@
 > All core functions are pure, deterministic, and execute in < 1ms.
 > Written in Rust, compiled alongside the compiler.
 
+> See `ORCHESTRATION.md` for cross-repo sequencing.
+
 ---
 
 ## Phase 1: Project Scaffolding & Core Module
@@ -141,6 +143,7 @@
 - [ ] Unit tests (deterministic with injected timestamps)
 
 ### 5.3 `convert` Module (5 functions)
+- [ ] Define `ConvertError` type for conversion failures
 - [ ] `convert.to_string(value: any) -> string` — always succeeds
 - [ ] `convert.to_number(value: any) -> Result<number, ConvertError>`
 - [ ] `convert.parse_int(s: string) -> Result<number, ConvertError>`
@@ -149,6 +152,7 @@
 - [ ] Unit tests (valid inputs, invalid inputs, Result handling)
 
 ### 5.4 `json` Module (2 functions)
+- [ ] Define `JsonError` type for parse failures
 - [ ] `json.parse(s: string) -> Result<any, JsonError>` — max depth: 32
 - [ ] `json.stringify(value: any) -> string`
 - [ ] Unit tests (valid JSON, invalid JSON, depth limit, type mapping)
@@ -158,6 +162,8 @@
 - [ ] `timer.start_once(action_name, delay_ms) -> string` — one-shot timer
 - [ ] `timer.stop(timer_id) -> nil` — no-op if invalid
 - [ ] `timer.stop_all() -> nil`
+- [ ] Timer calls yield to host via `env.host_call` — host enforces scheduling
+- [ ] Validate `action_name` references a declared action at compile time
 - [ ] Unit tests
 - [ ] 100-iteration determinism test for all Phase 5 modules
 
