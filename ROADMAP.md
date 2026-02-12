@@ -26,6 +26,8 @@
 - [x] Unit tests for all 4 functions (normal, edge, error cases)
 - [x] 100-iteration determinism test
 
+> **API FREEZE:** After Phase 1, the `Value` enum's public variants and the `StdlibModule` trait signature are **frozen**. All subsequent phases (math, string, list, etc.) add modules — they do not change `Value` or `StdlibModule`. This stability is critical because `pepl-eval` (C6) depends on these types.
+
 ---
 
 ## Phase 2: `math` Module
