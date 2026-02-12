@@ -105,7 +105,8 @@ impl CoreModule {
 
     /// `core.type_of(value: any) -> string`
     ///
-    /// Returns the type name: "number", "string", "bool", "nil", "list", "record".
+    /// Returns the type name: "number", "string", "bool", "nil", "list",
+    /// "record" (or declared type name for named records/sum variants).
     fn type_of(&self, args: Vec<Value>) -> Result<Value, StdlibError> {
         if args.len() != 1 {
             return Err(StdlibError::wrong_args("core.type_of", 1, args.len()));

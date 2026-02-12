@@ -21,12 +21,22 @@ fn test_value_type_names() {
     assert_eq!(Value::Bool(true).type_name(), "bool");
     assert_eq!(Value::Nil.type_name(), "nil");
     assert_eq!(Value::List(vec![]).type_name(), "list");
-    assert_eq!(Value::Record(BTreeMap::new()).type_name(), "record");
+    assert_eq!(Value::record(BTreeMap::new()).type_name(), "record");
     assert_eq!(
         Value::Color { r: 1.0, g: 0.0, b: 0.0, a: 1.0 }.type_name(),
         "color"
     );
     assert_eq!(Value::Number(1.0).ok().type_name(), "result");
+    // Named record returns declared type name
+    assert_eq!(
+        Value::named_record("Todo", BTreeMap::new()).type_name(),
+        "Todo"
+    );
+    // Sum variant returns declaring type name
+    assert_eq!(
+        Value::unit_variant("Status", "Active").type_name(),
+        "Status"
+    );
 }
 
 #[test]
@@ -79,9 +89,17 @@ fn test_value_display_record() {
     let mut fields = BTreeMap::new();
     fields.insert("name".to_string(), Value::String("Alice".into()));
     fields.insert("age".to_string(), Value::Number(30.0));
-    let record = Value::Record(fields);
+    let record = Value::record(fields);
     // BTreeMap iterates in alphabetical order
     assert_eq!(format!("{record}"), "{age: 30, name: \"Alice\"}");
+}
+
+#[test]
+fn test_value_display_named_record() {
+    let mut fields = BTreeMap::new();
+    fields.insert("x".to_string(), Value::Number(1.0));
+    let record = Value::named_record("Point", fields);
+    assert_eq!(format!("{record}"), "Point{x: 1}");
 }
 
 #[test]
@@ -152,8 +170,20 @@ fn test_value_equality_records() {
     let mut r3 = BTreeMap::new();
     r3.insert("x".to_string(), Value::Number(2.0));
 
-    assert_eq!(Value::Record(r1.clone()), Value::Record(r2));
-    assert_ne!(Value::Record(r1), Value::Record(r3));
+    assert_eq!(Value::record(r1.clone()), Value::record(r2));
+    assert_ne!(Value::record(r1), Value::record(r3));
+}
+
+#[test]
+fn test_value_equality_records_ignore_type_name() {
+    // Structural equality ignores type_name — type checker ensures compatibility
+    let mut fields = BTreeMap::new();
+    fields.insert("x".to_string(), Value::Number(1.0));
+    let a = Value::named_record("Foo", fields.clone());
+    let b = Value::named_record("Bar", fields.clone());
+    let c = Value::record(fields);
+    assert_eq!(a, b); // same fields, different name → equal
+    assert_eq!(a, c); // named vs anonymous → equal
 }
 
 #[test]
@@ -181,7 +211,8 @@ fn test_value_truthy() {
     assert!(Value::Number(-1.0).is_truthy());
     assert!(Value::String("hello".into()).is_truthy());
     assert!(Value::List(vec![]).is_truthy());
-    assert!(Value::Record(BTreeMap::new()).is_truthy());
+    assert!(Value::record(BTreeMap::new()).is_truthy());
+    assert!(Value::unit_variant("Status", "Active").is_truthy());
 }
 
 #[test]
@@ -221,7 +252,7 @@ fn test_value_as_list() {
 
 #[test]
 fn test_value_as_record() {
-    let v = Value::Record(BTreeMap::new());
+    let v = Value::record(BTreeMap::new());
     assert!(v.as_record().unwrap().is_empty());
     assert_eq!(Value::Nil.as_record(), None);
 }
@@ -395,9 +426,25 @@ fn test_core_type_of_list() {
 #[test]
 fn test_core_type_of_record() {
     let result = core()
-        .call("type_of", vec![Value::Record(BTreeMap::new())])
+        .call("type_of", vec![Value::record(BTreeMap::new())])
         .unwrap();
     assert_eq!(result, Value::String("record".into()));
+}
+
+#[test]
+fn test_core_type_of_named_record() {
+    let result = core()
+        .call("type_of", vec![Value::named_record("Todo", BTreeMap::new())])
+        .unwrap();
+    assert_eq!(result, Value::String("Todo".into()));
+}
+
+#[test]
+fn test_core_type_of_sum_variant() {
+    let result = core()
+        .call("type_of", vec![Value::unit_variant("Status", "Active")])
+        .unwrap();
+    assert_eq!(result, Value::String("Status".into()));
 }
 
 #[test]
@@ -500,6 +547,104 @@ fn test_error_display_assertion_failed() {
         message: "x > 0".into(),
     };
     assert_eq!(format!("{err}"), "Assertion failed: x > 0");
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// SumVariant tests
+// ══════════════════════════════════════════════════════════════════════════════
+
+#[test]
+fn test_sum_variant_unit() {
+    let v = Value::unit_variant("Status", "Active");
+    assert_eq!(v.type_name(), "Status");
+    assert_eq!(format!("{v}"), "Active");
+    assert!(v.is_truthy());
+}
+
+#[test]
+fn test_sum_variant_single_field() {
+    let v = Value::sum_variant("Shape", "Circle", vec![Value::Number(5.0)]);
+    assert_eq!(v.type_name(), "Shape");
+    assert_eq!(format!("{v}"), "Circle(5)");
+}
+
+#[test]
+fn test_sum_variant_multi_field() {
+    let v = Value::sum_variant(
+        "Shape",
+        "Rectangle",
+        vec![Value::Number(10.0), Value::Number(20.0)],
+    );
+    assert_eq!(format!("{v}"), "Rectangle(10, 20)");
+}
+
+#[test]
+fn test_sum_variant_equality_same() {
+    let a = Value::unit_variant("Status", "Active");
+    let b = Value::unit_variant("Status", "Active");
+    assert_eq!(a, b);
+}
+
+#[test]
+fn test_sum_variant_equality_different_variant() {
+    let a = Value::unit_variant("Status", "Active");
+    let b = Value::unit_variant("Status", "Inactive");
+    assert_ne!(a, b);
+}
+
+#[test]
+fn test_sum_variant_equality_different_type() {
+    // Nominal: same variant name but different declaring type → not equal
+    let a = Value::unit_variant("Status", "Active");
+    let b = Value::unit_variant("Priority", "Active");
+    assert_ne!(a, b);
+}
+
+#[test]
+fn test_sum_variant_equality_with_fields() {
+    let a = Value::sum_variant("Shape", "Circle", vec![Value::Number(5.0)]);
+    let b = Value::sum_variant("Shape", "Circle", vec![Value::Number(5.0)]);
+    let c = Value::sum_variant("Shape", "Circle", vec![Value::Number(10.0)]);
+    assert_eq!(a, b);
+    assert_ne!(a, c);
+}
+
+#[test]
+fn test_sum_variant_not_equal_to_other_types() {
+    let v = Value::unit_variant("Status", "Active");
+    assert_ne!(v, Value::String("Active".into()));
+    assert_ne!(v, Value::Bool(true));
+    assert_ne!(v, Value::Nil);
+}
+
+#[test]
+fn test_sum_variant_accessor() {
+    let v = Value::sum_variant("Shape", "Circle", vec![Value::Number(5.0)]);
+    let (type_name, variant, fields) = v.as_variant().unwrap();
+    assert_eq!(type_name, "Shape");
+    assert_eq!(variant, "Circle");
+    assert_eq!(fields.len(), 1);
+    assert_eq!(fields[0], Value::Number(5.0));
+    // Non-variant returns None
+    assert_eq!(Value::Nil.as_variant(), None);
+}
+
+#[test]
+fn test_declared_type_name() {
+    assert_eq!(Value::unit_variant("Status", "Active").declared_type_name(), Some("Status"));
+    assert_eq!(Value::named_record("Todo", BTreeMap::new()).declared_type_name(), Some("Todo"));
+    assert_eq!(Value::record(BTreeMap::new()).declared_type_name(), None);
+    assert_eq!(Value::Number(1.0).declared_type_name(), None);
+    assert_eq!(Value::Nil.declared_type_name(), None);
+}
+
+#[test]
+fn test_from_btreemap_creates_anonymous_record() {
+    let mut fields = BTreeMap::new();
+    fields.insert("x".to_string(), Value::Number(1.0));
+    let v: Value = fields.into();
+    assert_eq!(v.type_name(), "record");
+    assert_eq!(v.declared_type_name(), None);
 }
 
 // ══════════════════════════════════════════════════════════════════════════════

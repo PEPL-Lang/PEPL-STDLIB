@@ -14,7 +14,7 @@
 - [x] Create Cargo library crate `pepl-stdlib`
 - [x] Configure dependencies: `thiserror`, `serde`, `serde_json`
 - [x] Define `StdlibModule` trait (module name, function lookup, call dispatch)
-- [x] Define `Value` enum (Number, String, Bool, Nil, List, Record, Color, Result)
+- [x] Define `Value` enum (Number, String, Bool, Nil, List, Record, Color, Result, SumVariant)\n- [x] Record variant carries optional `type_name` for named record types\n- [x] SumVariant carries `type_name`, `variant`, positional `fields`
 - [x] Define `StdlibError` type
 - [x] Workspace-level `cargo build` succeeds
 
@@ -26,7 +26,7 @@
 - [x] Unit tests for all 4 functions (normal, edge, error cases)
 - [x] 100-iteration determinism test
 
-> **API FREEZE:** After Phase 1, the `Value` enum's public variants and the `StdlibModule` trait signature are **frozen**. All subsequent phases (math, string, list, etc.) add modules — they do not change `Value` or `StdlibModule`. This stability is critical because `pepl-eval` (C6) depends on these types.
+> **API FREEZE:** After Phase 1, the `Value` enum's public variants and the `StdlibModule` trait signature are **frozen**. All subsequent phases (math, string, list, etc.) add modules — they do not change `Value` or `StdlibModule`. This stability is critical because `pepl-eval` (C6) depends on these types.\n>\n> **Note:** `Function`, `ActionRef`, and `Surface` variants are NOT in `Value` — they live in `EvalValue` (pepl-eval), keeping the stdlib free of AST/evaluator dependencies.
 
 ---
 

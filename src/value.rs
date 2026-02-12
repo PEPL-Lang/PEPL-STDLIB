@@ -10,7 +10,8 @@ use std::fmt;
 /// # Type names
 ///
 /// [`Value::type_name`] returns the string used by `core.type_of()`:
-/// `"number"`, `"string"`, `"bool"`, `"nil"`, `"list"`, `"record"`.
+/// `"number"`, `"string"`, `"bool"`, `"nil"`, `"list"`, `"record"` (or the
+/// declared type name for named records/sum variants), `"color"`, `"result"`.
 #[derive(Debug, Clone)]
 pub enum Value {
     /// 64-bit IEEE 754 floating-point number.
@@ -32,7 +33,13 @@ pub enum Value {
     List(Vec<Value>),
 
     /// Named fields with values. Uses [`BTreeMap`] for deterministic ordering.
-    Record(BTreeMap<String, Value>),
+    ///
+    /// `type_name` is `Some("Todo")` for named record types (`type Todo = { ... }`),
+    /// `None` for anonymous inline records (`{ x: 1, y: 2 }`).
+    Record {
+        type_name: Option<String>,
+        fields: BTreeMap<String, Value>,
+    },
 
     /// RGBA color value. Each component is in the range 0.0–1.0.
     Color {
@@ -44,6 +51,17 @@ pub enum Value {
 
     /// Result type for fallible operations (`Ok` or `Err`).
     Result(Box<ResultValue>),
+
+    /// Sum type variant (e.g., `Shape.Circle(5, 10)`).
+    ///
+    /// `type_name` is the declaring sum type (e.g., `"Shape"`).
+    /// `variant` is the variant name (e.g., `"Circle"`).
+    /// `fields` holds positional values — empty for unit variants like `Active`.
+    SumVariant {
+        type_name: String,
+        variant: String,
+        fields: Vec<Value>,
+    },
 }
 
 /// The two variants of a PEPL `Result` value.
@@ -64,7 +82,9 @@ pub enum ResultValue {
 //   - record:  recursive field-by-field
 //   - color:   RGBA value comparison
 //   - result:  same variant + same inner value
-//   - functions/lambdas: always false (not representable in Value)
+//   - record:  structural (type_name ignored — type checker ensures compatibility)
+//   - sum:     nominal (type_name + variant + fields must all match)
+//   - Note: Functions/lambdas live in EvalValue (pepl-eval), not here
 
 impl PartialEq for Value {
     fn eq(&self, other: &Self) -> bool {
@@ -74,12 +94,18 @@ impl PartialEq for Value {
             (Value::Bool(a), Value::Bool(b)) => a == b,
             (Value::Nil, Value::Nil) => true,
             (Value::List(a), Value::List(b)) => a == b,
-            (Value::Record(a), Value::Record(b)) => a == b,
+            // Structural equality for records — type_name is metadata, not identity
+            (Value::Record { fields: a, .. }, Value::Record { fields: b, .. }) => a == b,
             (Value::Color { r: r1, g: g1, b: b1, a: a1 },
              Value::Color { r: r2, g: g2, b: b2, a: a2 }) => {
                 r1 == r2 && g1 == g2 && b1 == b2 && a1 == a2
             }
             (Value::Result(a), Value::Result(b)) => a == b,
+            // Nominal equality for sum variants — same type + variant + fields
+            (Value::SumVariant { type_name: t1, variant: v1, fields: f1 },
+             Value::SumVariant { type_name: t2, variant: v2, fields: f2 }) => {
+                t1 == t2 && v1 == v2 && f1 == f2
+            }
             _ => false, // different variants are never equal
         }
     }
@@ -127,7 +153,10 @@ impl fmt::Display for Value {
                 }
                 write!(f, "]")
             }
-            Value::Record(fields) => {
+            Value::Record { type_name, fields } => {
+                if let Some(name) = type_name {
+                    write!(f, "{name}")?;
+                }
                 write!(f, "{{")?;
                 for (i, (key, val)) in fields.iter().enumerate() {
                     if i > 0 {
@@ -139,6 +168,20 @@ impl fmt::Display for Value {
                     }
                 }
                 write!(f, "}}")
+            }
+            Value::SumVariant { variant, fields, .. } => {
+                write!(f, "{variant}")?;
+                if !fields.is_empty() {
+                    write!(f, "(")?;
+                    for (i, val) in fields.iter().enumerate() {
+                        if i > 0 {
+                            write!(f, ", ")?;
+                        }
+                        write!(f, "{val}")?;
+                    }
+                    write!(f, ")")?;
+                }
+                Ok(())
             }
             Value::Color { r, g, b, a } => {
                 write!(f, "color({r}, {g}, {b}, {a})")
@@ -155,16 +198,18 @@ impl fmt::Display for Value {
 
 impl Value {
     /// Returns the PEPL type name as used by `core.type_of()`.
-    pub fn type_name(&self) -> &'static str {
+    pub fn type_name(&self) -> &str {
         match self {
             Value::Number(_) => "number",
             Value::String(_) => "string",
             Value::Bool(_) => "bool",
             Value::Nil => "nil",
             Value::List(_) => "list",
-            Value::Record(_) => "record",
+            Value::Record { type_name: Some(name), .. } => name.as_str(),
+            Value::Record { type_name: None, .. } => "record",
             Value::Color { .. } => "color",
             Value::Result(_) => "result",
+            Value::SumVariant { type_name, .. } => type_name.as_str(),
         }
     }
 
@@ -179,7 +224,7 @@ impl Value {
             Value::Nil => false,
             Value::Number(n) => *n != 0.0,
             Value::String(s) => !s.is_empty(),
-            _ => true,
+            _ => true, // List, Record, Color, Result, SumVariant are truthy
         }
     }
 
@@ -191,6 +236,38 @@ impl Value {
     /// Convenience: wrap in `Err` result.
     pub fn err(self) -> Value {
         Value::Result(Box::new(ResultValue::Err(self)))
+    }
+
+    /// Create an anonymous record (no type name).
+    pub fn record(fields: BTreeMap<String, Value>) -> Value {
+        Value::Record { type_name: None, fields }
+    }
+
+    /// Create a named record (e.g., `type Todo = { ... }`).
+    pub fn named_record(type_name: impl Into<String>, fields: BTreeMap<String, Value>) -> Value {
+        Value::Record { type_name: Some(type_name.into()), fields }
+    }
+
+    /// Create a unit sum variant (no payload fields).
+    pub fn unit_variant(type_name: impl Into<String>, variant: impl Into<String>) -> Value {
+        Value::SumVariant {
+            type_name: type_name.into(),
+            variant: variant.into(),
+            fields: vec![],
+        }
+    }
+
+    /// Create a sum variant with positional fields.
+    pub fn sum_variant(
+        type_name: impl Into<String>,
+        variant: impl Into<String>,
+        fields: Vec<Value>,
+    ) -> Value {
+        Value::SumVariant {
+            type_name: type_name.into(),
+            variant: variant.into(),
+            fields,
+        }
     }
 
     /// Try to extract a number, returning `None` if not a `Number`.
@@ -228,7 +305,27 @@ impl Value {
     /// Try to extract a record reference, returning `None` if not a `Record`.
     pub fn as_record(&self) -> Option<&BTreeMap<String, Value>> {
         match self {
-            Value::Record(r) => Some(r),
+            Value::Record { fields, .. } => Some(fields),
+            _ => None,
+        }
+    }
+
+    /// Try to extract sum variant info: `(type_name, variant, fields)`.
+    pub fn as_variant(&self) -> Option<(&str, &str, &[Value])> {
+        match self {
+            Value::SumVariant { type_name, variant, fields } => {
+                Some((type_name, variant, fields))
+            }
+            _ => None,
+        }
+    }
+
+    /// Returns the declared type name for named records and sum variants.
+    /// Returns `None` for anonymous records and all other value types.
+    pub fn declared_type_name(&self) -> Option<&str> {
+        match self {
+            Value::Record { type_name: Some(name), .. } => Some(name),
+            Value::SumVariant { type_name, .. } => Some(type_name),
             _ => None,
         }
     }
@@ -263,5 +360,11 @@ impl From<String> for Value {
 impl From<bool> for Value {
     fn from(b: bool) -> Self {
         Value::Bool(b)
+    }
+}
+
+impl From<BTreeMap<String, Value>> for Value {
+    fn from(fields: BTreeMap<String, Value>) -> Self {
+        Value::Record { type_name: None, fields }
     }
 }
