@@ -33,21 +33,21 @@
 ## Phase 2: `math` Module
 
 ### 2.1 Math Functions (10 functions + 2 constants)
-- [ ] `math.abs(a: number) -> number`
-- [ ] `math.min(a: number, b: number) -> number`
-- [ ] `math.max(a: number, b: number) -> number`
-- [ ] `math.floor(a: number) -> number`
-- [ ] `math.ceil(a: number) -> number`
-- [ ] `math.round(a: number) -> number` — 0.5 rounds up
-- [ ] `math.round_to(a: number, decimals: number) -> number`
-- [ ] `math.pow(base: number, exp: number) -> number`
-- [ ] `math.clamp(value: number, min: number, max: number) -> number`
-- [ ] `math.sqrt(a: number) -> number` — trap on negative input (NaN prevention)
-- [ ] `math.PI` constant (3.14159265358979...)
-- [ ] `math.E` constant (2.71828182845904...)
-- [ ] NaN prevention: all operations that would produce NaN trap instead
-- [ ] Unit tests for all functions (normal, edge, NaN cases)
-- [ ] 100-iteration determinism test
+- [x] `math.abs(a: number) -> number`
+- [x] `math.min(a: number, b: number) -> number`
+- [x] `math.max(a: number, b: number) -> number`
+- [x] `math.floor(a: number) -> number`
+- [x] `math.ceil(a: number) -> number`
+- [x] `math.round(a: number) -> number` — 0.5 rounds up
+- [x] `math.round_to(a: number, decimals: number) -> number`
+- [x] `math.pow(base: number, exp: number) -> number`
+- [x] `math.clamp(value: number, min: number, max: number) -> number`
+- [x] `math.sqrt(a: number) -> number` — trap on negative input (NaN prevention)
+- [x] `math.PI` constant (3.14159265358979...)
+- [x] `math.E` constant (2.71828182845904...)
+- [x] NaN prevention: all operations that would produce NaN trap instead
+- [x] Unit tests for all functions (normal, edge, NaN cases)
+- [x] 100-iteration determinism test
 
 ---
 
