@@ -11,20 +11,20 @@
 ## Phase 1: Project Scaffolding & Core Module
 
 ### 1.1 Cargo Project Setup
-- [ ] Create Cargo library crate `pepl-stdlib`
-- [ ] Configure dependencies: `thiserror`, `serde`, `serde_json`
-- [ ] Define `StdlibModule` trait (module name, function lookup, call dispatch)
-- [ ] Define `Value` enum (Number, String, Bool, Nil, List, Record, Color, Result)
-- [ ] Define `StdlibError` type
-- [ ] Workspace-level `cargo build` succeeds
+- [x] Create Cargo library crate `pepl-stdlib`
+- [x] Configure dependencies: `thiserror`, `serde`, `serde_json`
+- [x] Define `StdlibModule` trait (module name, function lookup, call dispatch)
+- [x] Define `Value` enum (Number, String, Bool, Nil, List, Record, Color, Result)
+- [x] Define `StdlibError` type
+- [x] Workspace-level `cargo build` succeeds
 
 ### 1.2 `core` Module (4 functions)
-- [ ] `core.log(value: any) -> nil` — debug output, no-op in production
-- [ ] `core.assert(condition: bool, message?: string) -> nil` — trap if false
-- [ ] `core.type_of(value: any) -> string` — returns type name
-- [ ] `core.capability(name: string) -> bool` — checks optional capability availability
-- [ ] Unit tests for all 4 functions (normal, edge, error cases)
-- [ ] 100-iteration determinism test
+- [x] `core.log(value: any) -> nil` — debug output, no-op in production
+- [x] `core.assert(condition: bool, message?: string) -> nil` — trap if false
+- [x] `core.type_of(value: any) -> string` — returns type name
+- [x] `core.capability(name: string) -> bool` — checks optional capability availability
+- [x] Unit tests for all 4 functions (normal, edge, error cases)
+- [x] 100-iteration determinism test
 
 ---
 
