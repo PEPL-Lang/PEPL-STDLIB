@@ -1,5 +1,8 @@
 use std::collections::BTreeMap;
 use std::fmt;
+use std::sync::Arc;
+
+use crate::error::StdlibError;
 
 /// Runtime value in PEPL.
 ///
@@ -62,6 +65,44 @@ pub enum Value {
         variant: String,
         fields: Vec<Value>,
     },
+
+    /// A callable function value for higher-order stdlib operations (map, filter, etc.).
+    ///
+    /// Wraps an `Arc<dyn Fn>` so it can be cloned and passed through `Vec<Value>`.
+    /// The evaluator creates these by wrapping PEPL lambdas/functions.
+    Function(StdlibFn),
+}
+
+/// A callable function value for higher-order stdlib operations.
+///
+/// Wraps an `Arc<dyn Fn>` so it can be cloned, and provides Debug/PartialEq
+/// implementations that the derive macros can't auto-generate for `dyn Fn`.
+#[derive(Clone)]
+pub struct StdlibFn(pub Arc<dyn Fn(Vec<Value>) -> Result<Value, StdlibError> + Send + Sync>);
+
+impl StdlibFn {
+    /// Create a new stdlib function from a closure.
+    pub fn new(f: impl Fn(Vec<Value>) -> Result<Value, StdlibError> + Send + Sync + 'static) -> Self {
+        Self(Arc::new(f))
+    }
+
+    /// Call the function with the given arguments.
+    pub fn call(&self, args: Vec<Value>) -> Result<Value, StdlibError> {
+        (self.0)(args)
+    }
+}
+
+impl fmt::Debug for StdlibFn {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "<function>")
+    }
+}
+
+impl PartialEq for StdlibFn {
+    fn eq(&self, other: &Self) -> bool {
+        // Function identity by Arc pointer equality
+        Arc::ptr_eq(&self.0, &other.0)
+    }
 }
 
 /// The two variants of a PEPL `Result` value.
@@ -106,6 +147,8 @@ impl PartialEq for Value {
              Value::SumVariant { type_name: t2, variant: v2, fields: f2 }) => {
                 t1 == t2 && v1 == v2 && f1 == f2
             }
+            // Function identity by Arc pointer equality
+            (Value::Function(a), Value::Function(b)) => a == b,
             _ => false, // different variants are never equal
         }
     }
@@ -190,6 +233,7 @@ impl fmt::Display for Value {
                 ResultValue::Ok(v) => write!(f, "Ok({v})"),
                 ResultValue::Err(v) => write!(f, "Err({v})"),
             },
+            Value::Function(_) => write!(f, "<function>"),
         }
     }
 }
@@ -210,6 +254,7 @@ impl Value {
             Value::Color { .. } => "color",
             Value::Result(_) => "result",
             Value::SumVariant { type_name, .. } => type_name.as_str(),
+            Value::Function(_) => "function",
         }
     }
 
@@ -224,7 +269,7 @@ impl Value {
             Value::Nil => false,
             Value::Number(n) => *n != 0.0,
             Value::String(s) => !s.is_empty(),
-            _ => true, // List, Record, Color, Result, SumVariant are truthy
+            _ => true, // List, Record, Color, Result, SumVariant, Function are truthy
         }
     }
 
@@ -316,6 +361,14 @@ impl Value {
             Value::SumVariant { type_name, variant, fields } => {
                 Some((type_name, variant, fields))
             }
+            _ => None,
+        }
+    }
+
+    /// Try to extract a function reference, returning `None` if not a `Function`.
+    pub fn as_function(&self) -> Option<&StdlibFn> {
+        match self {
+            Value::Function(f) => Some(f),
             _ => None,
         }
     }

@@ -2,7 +2,7 @@
 
 The PEPL standard library — deterministic, pure functions for PEPL programs.
 
-**Status:** Phase 3 complete (core + math + string). See [ROADMAP.md](ROADMAP.md) for progress.
+**Status:** Phase 4 complete (core + math + string + list). See [ROADMAP.md](ROADMAP.md) for progress.
 
 ## Modules
 
@@ -11,7 +11,7 @@ The PEPL standard library — deterministic, pure functions for PEPL programs.
 | `core` | 4 (type_of, to_string, print, assert) | ✅ Done |
 | `math` | 10 + 2 constants (PI, E) | ✅ Done |
 | `string` | 20 (length, concat, contains, slice, trim, split, etc.) | ✅ Done |
-| `list` | 31 (construction, transformation, higher-order) | Planned (Phase 4) |
+| `list` | 31 (construction, access, modification, higher-order, query) | ✅ Done |
 | `record` | 5 | Planned (Phase 5) |
 | `time` | 5 | Planned (Phase 5) |
 | `convert` | 5 | Planned (Phase 5) |
@@ -20,10 +20,11 @@ The PEPL standard library — deterministic, pure functions for PEPL programs.
 
 ## Tests
 
-269 tests:
+386 tests:
 - core: 75
 - math: 85
 - string: 109
+- list: 117
 
 ## Key Design Choices
 

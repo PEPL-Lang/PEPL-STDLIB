@@ -81,48 +81,61 @@
 
 ## Phase 4: `list` Module
 
-### 4.1 List Construction & Query (12 functions)
-- [ ] `list.empty() -> list<T>`
-- [ ] `list.of(...items) -> list<T>` — compiler-special-cased variadic
-- [ ] `list.range(start, end) -> list<number>` — start inclusive, end exclusive
-- [ ] `list.repeat(item, count) -> list<T>`
-- [ ] `list.length(l) -> number`
-- [ ] `list.is_empty(l) -> bool`
-- [ ] `list.contains(l, item) -> bool`
-- [ ] `list.index_of(l, item) -> number` — returns -1 if not found
-- [ ] `list.first(l) -> T | nil`
-- [ ] `list.last(l) -> T | nil`
-- [ ] `list.get(l, index) -> T | nil` — returns nil on out-of-bounds
-- [ ] Unit tests for all query functions
+> **Note:** The canonical set of 31 list functions is defined by the compiler's
+> type-checker registrations (`pepl-compiler/src/stdlib.rs`). This phase
+> implements exactly those 31 functions.
 
-### 4.2 List Transformation (12 functions)
-- [ ] `list.append(l, item) -> list<T>`
-- [ ] `list.prepend(l, item) -> list<T>`
-- [ ] `list.set(l, index, item) -> list<T>`
-- [ ] `list.remove(l, index) -> list<T>`
-- [ ] `list.concat(a, b) -> list<T>`
-- [ ] `list.reverse(l) -> list<T>`
-- [ ] `list.sort(l, comparator) -> list<T>` — stable, deterministic sorting
-- [ ] `list.sort_by(l, key) -> list<T>` — string keys: lexicographic, case-sensitive
-- [ ] `list.unique(l) -> list<T>` — preserves first occurrence
-- [ ] `list.slice(l, start, end) -> list<T>`
-- [ ] `list.take(l, count) -> list<T>`
-- [ ] `list.drop(l, count) -> list<T>`
-- [ ] All operations return NEW lists (immutable)
-- [ ] Unit tests for all transformation functions
+### 4.1 List Construction (4 functions)
+- [x] `list.empty() -> list`
+- [x] `list.of(...items) -> list` — variadic
+- [x] `list.repeat(value, count) -> list`
+- [x] `list.range(start, end) -> list<number>` — start inclusive, end exclusive
 
-### 4.3 List Higher-Order (7 functions)
-- [ ] `list.map(l, fn) -> list<U>`
-- [ ] `list.filter(l, fn) -> list<T>`
-- [ ] `list.reduce(l, init, fn) -> U`
-- [ ] `list.find(l, fn) -> T | nil`
-- [ ] `list.flat_map(l, fn) -> list<U>`
-- [ ] `list.any(l, fn) -> bool`
-- [ ] `list.every(l, fn) -> bool`
-- [ ] `list.count(l, fn) -> number`
-- [ ] Unit tests for all higher-order functions
-- [ ] Sort stability test: equal-key elements preserve order
-- [ ] 100-iteration determinism test for entire list module
+### 4.2 List Access (5 functions)
+- [x] `list.length(items) -> number`
+- [x] `list.get(items, index) -> any|nil` — returns nil on out-of-bounds
+- [x] `list.first(items) -> any|nil`
+- [x] `list.last(items) -> any|nil`
+- [x] `list.index_of(items, value) -> number` — returns -1 if not found
+
+### 4.3 List Modification (10 functions)
+- [x] `list.append(items, value) -> list`
+- [x] `list.prepend(items, value) -> list`
+- [x] `list.insert(items, index, value) -> list`
+- [x] `list.remove(items, index) -> list`
+- [x] `list.update(items, index, value) -> list`
+- [x] `list.slice(items, start, end) -> list`
+- [x] `list.concat(a, b) -> list`
+- [x] `list.reverse(items) -> list`
+- [x] `list.flatten(items) -> list` — one level deep
+- [x] `list.unique(items) -> list` — preserves first occurrence
+- [x] All operations return NEW lists (immutable)
+
+### 4.4 List Higher-Order (9 functions)
+- [x] `list.map(items, f) -> list`
+- [x] `list.filter(items, pred) -> list`
+- [x] `list.reduce(items, init, f) -> any`
+- [x] `list.find(items, pred) -> any|nil`
+- [x] `list.find_index(items, pred) -> number` — returns -1 if not found
+- [x] `list.every(items, pred) -> bool`
+- [x] `list.some(items, pred) -> bool`
+- [x] `list.sort(items, compare) -> list` — stable, deterministic
+- [x] `list.count(items, pred) -> number`
+- [x] Added `Value::Function(StdlibFn)` variant for callback support
+
+### 4.5 List Query (3 functions)
+- [x] `list.contains(items, value) -> bool`
+- [x] `list.zip(a, b) -> list<{first, second}>` — stops at shorter list
+- [x] `list.take(items, n) -> list`
+
+### 4.6 Testing & Validation
+- [x] Unit tests for all 31 functions (normal, edge, error cases)
+- [x] Higher-order tests with real callback functions
+- [x] Integration tests (chaining filter→map, range→reduce, etc.)
+- [x] Sort stability & comparator error propagation tests
+- [x] 100-iteration determinism test
+- [x] `cargo clippy` clean
+- [x] 117 list module tests, 386 total crate tests
 
 ---
 

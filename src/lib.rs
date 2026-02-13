@@ -25,4 +25,4 @@ pub mod modules;
 
 pub use error::StdlibError;
 pub use module::StdlibModule;
-pub use value::{ResultValue, Value};
+pub use value::{ResultValue, StdlibFn, Value};
