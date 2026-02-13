@@ -1,4 +1,4 @@
-//! Tests for the `list` module — 31 functions.
+//! Tests for the `list` module — 32 functions (31 spec + 5 extensions + `some` alias).
 //!
 //! Each function gets:
 //! - Normal-case tests (1–3)
@@ -265,10 +265,7 @@ fn get_empty_list() {
 
 #[test]
 fn first_nonempty() {
-    assert_eq!(
-        call_ok("first", vec![lst(vec![s("a"), s("b")])]),
-        s("a")
-    );
+    assert_eq!(call_ok("first", vec![lst(vec![s("a"), s("b")])]), s("a"));
 }
 
 #[test]
@@ -307,10 +304,7 @@ fn index_of_not_found() {
 
 #[test]
 fn index_of_empty() {
-    assert_eq!(
-        call_ok("index_of", vec![lst(vec![]), num(1.0)]),
-        num(-1.0)
-    );
+    assert_eq!(call_ok("index_of", vec![lst(vec![]), num(1.0)]), num(-1.0));
 }
 
 #[test]
@@ -556,10 +550,7 @@ fn flatten_basic() {
 #[test]
 fn flatten_already_flat() {
     let flat = lst(vec![num(1.0), num(2.0)]);
-    assert_eq!(
-        call_ok("flatten", vec![flat.clone()]),
-        flat
-    );
+    assert_eq!(call_ok("flatten", vec![flat.clone()]), flat);
 }
 
 #[test]
@@ -591,10 +582,7 @@ fn unique_basic() {
 #[test]
 fn unique_no_duplicates() {
     let items = lst(vec![num(1.0), num(2.0), num(3.0)]);
-    assert_eq!(
-        call_ok("unique", vec![items.clone()]),
-        items
-    );
+    assert_eq!(call_ok("unique", vec![items.clone()]), items);
 }
 
 #[test]
@@ -637,10 +625,7 @@ fn map_to_string() {
 
 #[test]
 fn map_empty() {
-    assert_eq!(
-        call_ok("map", vec![lst(vec![]), double()]),
-        lst(vec![])
-    );
+    assert_eq!(call_ok("map", vec![lst(vec![]), double()]), lst(vec![]));
 }
 
 #[test]
@@ -663,27 +648,18 @@ fn filter_even() {
 #[test]
 fn filter_none_match() {
     let items = lst(vec![num(1.0), num(3.0), num(5.0)]);
-    assert_eq!(
-        call_ok("filter", vec![items, is_even()]),
-        lst(vec![])
-    );
+    assert_eq!(call_ok("filter", vec![items, is_even()]), lst(vec![]));
 }
 
 #[test]
 fn filter_all_match() {
     let items = lst(vec![num(2.0), num(4.0)]);
-    assert_eq!(
-        call_ok("filter", vec![items.clone(), is_even()]),
-        items
-    );
+    assert_eq!(call_ok("filter", vec![items.clone(), is_even()]), items);
 }
 
 #[test]
 fn filter_empty() {
-    assert_eq!(
-        call_ok("filter", vec![lst(vec![]), is_even()]),
-        lst(vec![])
-    );
+    assert_eq!(call_ok("filter", vec![lst(vec![]), is_even()]), lst(vec![]));
 }
 
 // ── list.reduce ───────────────────────────────────────────────────────────────
@@ -722,10 +698,7 @@ fn reduce_string_concat() {
         Ok(Value::String(format!("{a}{b}")))
     });
     let items = lst(vec![s("a"), s("b"), s("c")]);
-    assert_eq!(
-        call_ok("reduce", vec![items, s(""), concat_fn]),
-        s("abc")
-    );
+    assert_eq!(call_ok("reduce", vec![items, s(""), concat_fn]), s("abc"));
 }
 
 // ── list.find ─────────────────────────────────────────────────────────────────
@@ -781,23 +754,31 @@ fn every_empty() {
     assert_eq!(call_ok("every", vec![lst(vec![]), is_even()]), b(true));
 }
 
-// ── list.some ─────────────────────────────────────────────────────────────────
+// ── list.any (spec name) / list.some (backward-compat alias) ─────────────────
 
 #[test]
-fn some_one_matches() {
+fn any_one_matches() {
     let items = lst(vec![num(1.0), num(2.0), num(3.0)]);
-    assert_eq!(call_ok("some", vec![items, is_even()]), b(true));
+    assert_eq!(call_ok("any", vec![items, is_even()]), b(true));
 }
 
 #[test]
-fn some_none_match() {
+fn any_none_match() {
     let items = lst(vec![num(1.0), num(3.0), num(5.0)]);
-    assert_eq!(call_ok("some", vec![items, is_even()]), b(false));
+    assert_eq!(call_ok("any", vec![items, is_even()]), b(false));
 }
 
 #[test]
-fn some_empty() {
-    assert_eq!(call_ok("some", vec![lst(vec![]), is_even()]), b(false));
+fn any_empty() {
+    assert_eq!(call_ok("any", vec![lst(vec![]), is_even()]), b(false));
+}
+
+#[test]
+fn some_alias_works() {
+    // list.some is a backward-compat alias for list.any
+    let items = lst(vec![num(1.0), num(2.0), num(3.0)]);
+    assert_eq!(call_ok("some", vec![items.clone(), is_even()]), b(true));
+    assert_eq!(call_ok("any", vec![items, is_even()]), b(true));
 }
 
 // ── list.sort ─────────────────────────────────────────────────────────────────
@@ -823,18 +804,12 @@ fn sort_descending() {
 #[test]
 fn sort_already_sorted() {
     let items = lst(vec![num(1.0), num(2.0), num(3.0)]);
-    assert_eq!(
-        call_ok("sort", vec![items.clone(), cmp_asc()]),
-        items
-    );
+    assert_eq!(call_ok("sort", vec![items.clone(), cmp_asc()]), items);
 }
 
 #[test]
 fn sort_empty() {
-    assert_eq!(
-        call_ok("sort", vec![lst(vec![]), cmp_asc()]),
-        lst(vec![])
-    );
+    assert_eq!(call_ok("sort", vec![lst(vec![]), cmp_asc()]), lst(vec![]));
 }
 
 #[test]
@@ -891,10 +866,7 @@ fn contains_not_found() {
 
 #[test]
 fn contains_empty() {
-    assert_eq!(
-        call_ok("contains", vec![lst(vec![]), num(1.0)]),
-        b(false)
-    );
+    assert_eq!(call_ok("contains", vec![lst(vec![]), num(1.0)]), b(false));
 }
 
 #[test]
@@ -984,6 +956,74 @@ fn take_negative() {
     assert!(call("take", vec![items, num(-1.0)]).is_err());
 }
 
+// ── list.drop ─────────────────────────────────────────────────────────────────
+
+#[test]
+fn drop_basic() {
+    let items = lst(vec![num(1.0), num(2.0), num(3.0), num(4.0)]);
+    assert_eq!(
+        call_ok("drop", vec![items, num(2.0)]),
+        lst(vec![num(3.0), num(4.0)])
+    );
+}
+
+#[test]
+fn drop_zero() {
+    let items = lst(vec![num(1.0), num(2.0), num(3.0)]);
+    assert_eq!(
+        call_ok("drop", vec![items.clone(), num(0.0)]),
+        items
+    );
+}
+
+#[test]
+fn drop_more_than_length() {
+    let items = lst(vec![num(1.0), num(2.0)]);
+    assert_eq!(
+        call_ok("drop", vec![items, num(100.0)]),
+        lst(vec![])
+    );
+}
+
+#[test]
+fn drop_exact_length() {
+    let items = lst(vec![num(1.0), num(2.0)]);
+    assert_eq!(
+        call_ok("drop", vec![items, num(2.0)]),
+        lst(vec![])
+    );
+}
+
+#[test]
+fn drop_empty_list() {
+    assert_eq!(
+        call_ok("drop", vec![lst(vec![]), num(5.0)]),
+        lst(vec![])
+    );
+}
+
+#[test]
+fn drop_negative() {
+    let items = lst(vec![num(1.0)]);
+    assert!(call("drop", vec![items, num(-1.0)]).is_err());
+}
+
+#[test]
+fn drop_fractional() {
+    let items = lst(vec![num(1.0)]);
+    assert!(call("drop", vec![items, num(1.5)]).is_err());
+}
+
+#[test]
+fn drop_wrong_arg_count() {
+    assert!(call("drop", vec![lst(vec![num(1.0)])]).is_err());
+}
+
+#[test]
+fn drop_wrong_type() {
+    assert!(call("drop", vec![num(1.0), num(1.0)]).is_err());
+}
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // Module trait
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -994,21 +1034,28 @@ fn module_name() {
 }
 
 #[test]
-fn has_all_31_functions() {
+fn has_all_functions() {
     let m = list();
+    // 31 spec functions + 5 extensions (insert, update, find_index, zip, flatten)
+    // + backward-compat alias (some → any)
     let functions = [
+        // Construction
         "empty", "of", "repeat", "range",
+        // Access
         "length", "get", "first", "last", "index_of",
-        "append", "prepend", "insert", "remove", "update",
+        // Modification
+        "append", "prepend", "insert", "remove", "update", "set",
         "slice", "concat", "reverse", "flatten", "unique",
+        // Higher-order
         "map", "filter", "reduce", "find", "find_index",
-        "every", "some", "sort", "count",
-        "contains", "zip", "take",
+        "every", "any", "some", "sort", "count",
+        // Query
+        "contains", "zip", "take", "drop",
     ];
     for f in &functions {
         assert!(m.has_function(f), "missing function: {f}");
     }
-    assert_eq!(functions.len(), 31);
+    assert_eq!(functions.len(), 34); // 32 unique + set alias + some alias
 }
 
 #[test]
@@ -1056,6 +1103,16 @@ fn chain_repeat_flatten_unique() {
     assert_eq!(uniq, lst(vec![num(1.0), num(2.0)]));
 }
 
+#[test]
+fn chain_take_drop_complement() {
+    // take(n) ++ drop(n) == original list
+    let items = lst(vec![num(1.0), num(2.0), num(3.0), num(4.0), num(5.0)]);
+    let head = call_ok("take", vec![items.clone(), num(3.0)]);
+    let tail = call_ok("drop", vec![items.clone(), num(3.0)]);
+    let recombined = call_ok("concat", vec![head, tail]);
+    assert_eq!(recombined, items);
+}
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // Determinism (100 iterations)
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -1081,6 +1138,14 @@ fn determinism_100_iterations() {
         assert_eq!(
             m.call("filter", vec![items.clone(), gt(2.5)]).unwrap(),
             lst(vec![num(3.0), num(4.0), num(5.0)])
+        );
+        assert_eq!(
+            m.call("drop", vec![items.clone(), num(2.0)]).unwrap(),
+            lst(vec![num(4.0), num(1.0), num(5.0)])
+        );
+        assert_eq!(
+            m.call("any", vec![items.clone(), gt(4.0)]).unwrap(),
+            b(true)
         );
     }
 }

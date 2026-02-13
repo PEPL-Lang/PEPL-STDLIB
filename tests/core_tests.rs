@@ -1,7 +1,7 @@
 //! Integration tests for `pepl-stdlib` Phase 1: scaffolding + core module.
 
-use pepl_stdlib::{StdlibError, StdlibModule, Value};
 use pepl_stdlib::modules::core::CoreModule;
+use pepl_stdlib::{StdlibError, StdlibModule, Value};
 use std::collections::BTreeMap;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -23,7 +23,13 @@ fn test_value_type_names() {
     assert_eq!(Value::List(vec![]).type_name(), "list");
     assert_eq!(Value::record(BTreeMap::new()).type_name(), "record");
     assert_eq!(
-        Value::Color { r: 1.0, g: 0.0, b: 0.0, a: 1.0 }.type_name(),
+        Value::Color {
+            r: 1.0,
+            g: 0.0,
+            b: 0.0,
+            a: 1.0
+        }
+        .type_name(),
         "color"
     );
     assert_eq!(Value::Number(1.0).ok().type_name(), "result");
@@ -104,7 +110,12 @@ fn test_value_display_named_record() {
 
 #[test]
 fn test_value_display_color() {
-    let color = Value::Color { r: 1.0, g: 0.5, b: 0.0, a: 1.0 };
+    let color = Value::Color {
+        r: 1.0,
+        g: 0.5,
+        b: 0.0,
+        a: 1.0,
+    };
     assert_eq!(format!("{color}"), "color(1, 0.5, 0, 1)");
 }
 
@@ -133,14 +144,8 @@ fn test_value_equality_nan() {
 
 #[test]
 fn test_value_equality_strings() {
-    assert_eq!(
-        Value::String("hello".into()),
-        Value::String("hello".into())
-    );
-    assert_ne!(
-        Value::String("hello".into()),
-        Value::String("world".into())
-    );
+    assert_eq!(Value::String("hello".into()), Value::String("hello".into()));
+    assert_ne!(Value::String("hello".into()), Value::String("world".into()));
 }
 
 #[test]
@@ -188,9 +193,24 @@ fn test_value_equality_records_ignore_type_name() {
 
 #[test]
 fn test_value_equality_colors() {
-    let c1 = Value::Color { r: 1.0, g: 0.0, b: 0.0, a: 1.0 };
-    let c2 = Value::Color { r: 1.0, g: 0.0, b: 0.0, a: 1.0 };
-    let c3 = Value::Color { r: 0.0, g: 1.0, b: 0.0, a: 1.0 };
+    let c1 = Value::Color {
+        r: 1.0,
+        g: 0.0,
+        b: 0.0,
+        a: 1.0,
+    };
+    let c2 = Value::Color {
+        r: 1.0,
+        g: 0.0,
+        b: 0.0,
+        a: 1.0,
+    };
+    let c3 = Value::Color {
+        r: 0.0,
+        g: 1.0,
+        b: 0.0,
+        a: 1.0,
+    };
     assert_eq!(c1, c2);
     assert_ne!(c1, c3);
 }
@@ -302,10 +322,16 @@ fn test_core_log_returns_nil() {
 #[test]
 fn test_core_log_accepts_any_type() {
     let c = core();
-    assert_eq!(c.call("log", vec![Value::String("hi".into())]).unwrap(), Value::Nil);
+    assert_eq!(
+        c.call("log", vec![Value::String("hi".into())]).unwrap(),
+        Value::Nil
+    );
     assert_eq!(c.call("log", vec![Value::Bool(true)]).unwrap(), Value::Nil);
     assert_eq!(c.call("log", vec![Value::Nil]).unwrap(), Value::Nil);
-    assert_eq!(c.call("log", vec![Value::List(vec![])]).unwrap(), Value::Nil);
+    assert_eq!(
+        c.call("log", vec![Value::List(vec![])]).unwrap(),
+        Value::Nil
+    );
 }
 
 #[test]
@@ -313,7 +339,9 @@ fn test_core_log_wrong_arg_count() {
     let err = core().call("log", vec![]).unwrap_err();
     assert!(matches!(err, StdlibError::WrongArgCount { .. }));
 
-    let err = core().call("log", vec![Value::Nil, Value::Nil]).unwrap_err();
+    let err = core()
+        .call("log", vec![Value::Nil, Value::Nil])
+        .unwrap_err();
     assert!(matches!(err, StdlibError::WrongArgCount { .. }));
 }
 
@@ -330,7 +358,10 @@ fn test_core_assert_true() {
 #[test]
 fn test_core_assert_true_with_message() {
     let result = core()
-        .call("assert", vec![Value::Bool(true), Value::String("ok".into())])
+        .call(
+            "assert",
+            vec![Value::Bool(true), Value::String("ok".into())],
+        )
         .unwrap();
     assert_eq!(result, Value::Nil);
 }
@@ -351,7 +382,10 @@ fn test_core_assert_false_with_message() {
     let err = core()
         .call(
             "assert",
-            vec![Value::Bool(false), Value::String("count must be positive".into())],
+            vec![
+                Value::Bool(false),
+                Value::String("count must be positive".into()),
+            ],
         )
         .unwrap_err();
     match err {
@@ -364,9 +398,7 @@ fn test_core_assert_false_with_message() {
 
 #[test]
 fn test_core_assert_type_mismatch_condition() {
-    let err = core()
-        .call("assert", vec![Value::Number(1.0)])
-        .unwrap_err();
+    let err = core().call("assert", vec![Value::Number(1.0)]).unwrap_err();
     assert!(matches!(err, StdlibError::TypeMismatch { .. }));
 }
 
@@ -384,7 +416,10 @@ fn test_core_assert_wrong_arg_count() {
     assert!(matches!(err, StdlibError::WrongArgCount { .. }));
 
     let err = core()
-        .call("assert", vec![Value::Bool(true), Value::String("a".into()), Value::Nil])
+        .call(
+            "assert",
+            vec![Value::Bool(true), Value::String("a".into()), Value::Nil],
+        )
         .unwrap_err();
     assert!(matches!(err, StdlibError::WrongArgCount { .. }));
 }
@@ -401,7 +436,9 @@ fn test_core_type_of_number() {
 
 #[test]
 fn test_core_type_of_string() {
-    let result = core().call("type_of", vec![Value::String("hi".into())]).unwrap();
+    let result = core()
+        .call("type_of", vec![Value::String("hi".into())])
+        .unwrap();
     assert_eq!(result, Value::String("string".into()));
 }
 
@@ -434,7 +471,10 @@ fn test_core_type_of_record() {
 #[test]
 fn test_core_type_of_named_record() {
     let result = core()
-        .call("type_of", vec![Value::named_record("Todo", BTreeMap::new())])
+        .call(
+            "type_of",
+            vec![Value::named_record("Todo", BTreeMap::new())],
+        )
         .unwrap();
     assert_eq!(result, Value::String("Todo".into()));
 }
@@ -468,11 +508,21 @@ fn test_core_capability_returns_false() {
 #[test]
 fn test_core_capability_any_name_returns_false() {
     let c = core();
-    for name in &["http", "storage", "location", "notifications", "nonexistent"] {
+    for name in &[
+        "http",
+        "storage",
+        "location",
+        "notifications",
+        "nonexistent",
+    ] {
         let result = c
             .call("capability", vec![Value::String((*name).into())])
             .unwrap();
-        assert_eq!(result, Value::Bool(false), "capability({name}) should be false");
+        assert_eq!(
+            result,
+            Value::Bool(false),
+            "capability({name}) should be false"
+        );
     }
 }
 
@@ -631,8 +681,14 @@ fn test_sum_variant_accessor() {
 
 #[test]
 fn test_declared_type_name() {
-    assert_eq!(Value::unit_variant("Status", "Active").declared_type_name(), Some("Status"));
-    assert_eq!(Value::named_record("Todo", BTreeMap::new()).declared_type_name(), Some("Todo"));
+    assert_eq!(
+        Value::unit_variant("Status", "Active").declared_type_name(),
+        Some("Status")
+    );
+    assert_eq!(
+        Value::named_record("Todo", BTreeMap::new()).declared_type_name(),
+        Some("Todo")
+    );
     assert_eq!(Value::record(BTreeMap::new()).declared_type_name(), None);
     assert_eq!(Value::Number(1.0).declared_type_name(), None);
     assert_eq!(Value::Nil.declared_type_name(), None);

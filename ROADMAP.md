@@ -188,37 +188,67 @@
 ## Phase 6: Capability Modules
 
 ### 6.1 `http` Module (5 functions)
-- [ ] `http.get(url, options?) -> Result<HttpResponse, HttpError>`
-- [ ] `http.post(url, body, options?) -> Result<HttpResponse, HttpError>`
-- [ ] `http.put(url, body, options?) -> Result<HttpResponse, HttpError>`
-- [ ] `http.patch(url, body, options?) -> Result<HttpResponse, HttpError>`
-- [ ] `http.delete(url, options?) -> Result<HttpResponse, HttpError>`
-- [ ] Define `HttpOptions`, `HttpResponse`, `HttpError` types
-- [ ] All calls yield to host via `env.host_call` (cap_id=1)
-- [ ] Unit tests with mocked host responses
+- [x] `http.get(url, options?) -> Result<HttpResponse, HttpError>`
+- [x] `http.post(url, body, options?) -> Result<HttpResponse, HttpError>`
+- [x] `http.put(url, body, options?) -> Result<HttpResponse, HttpError>`
+- [x] `http.patch(url, body, options?) -> Result<HttpResponse, HttpError>`
+- [x] `http.delete(url, options?) -> Result<HttpResponse, HttpError>`
+- [x] Define `HttpOptions`, `HttpResponse`, `HttpError` types
+- [x] All calls yield to host via `env.host_call` (cap_id=1)
+- [x] Unit tests with mocked host responses
 
 ### 6.2 `storage` Module (4 functions)
-- [ ] `storage.get(key) -> Result<string, StorageError>`
-- [ ] `storage.set(key, value) -> Result<nil, StorageError>`
-- [ ] `storage.delete(key) -> Result<nil, StorageError>`
-- [ ] `storage.keys() -> Result<list<string>, StorageError>`
-- [ ] All calls yield to host via `env.host_call` (cap_id=2)
-- [ ] Unit tests with mocked host responses
+- [x] `storage.get(key) -> Result<string, StorageError>`
+- [x] `storage.set(key, value) -> Result<nil, StorageError>`
+- [x] `storage.delete(key) -> Result<nil, StorageError>`
+- [x] `storage.keys() -> Result<list<string>, StorageError>`
+- [x] All calls yield to host via `env.host_call` (cap_id=2)
+- [x] Unit tests with mocked host responses
 
 ### 6.3 `location` Module (1 function)
-- [ ] `location.current() -> Result<{lat: number, lon: number}, LocationError>`
-- [ ] Yields to host via `env.host_call` (cap_id=3)
-- [ ] Unit tests
+- [x] `location.current() -> Result<{lat: number, lon: number}, LocationError>`
+- [x] Yields to host via `env.host_call` (cap_id=3)
+- [x] Unit tests
 
 ### 6.4 `notifications` Module (1 function)
-- [ ] `notifications.send(title, body) -> Result<nil, NotificationError>`
-- [ ] Yields to host via `env.host_call` (cap_id=4)
-- [ ] Unit tests
+- [x] `notifications.send(title, body) -> Result<nil, NotificationError>`
+- [x] Yields to host via `env.host_call` (cap_id=4)
+- [x] Unit tests
 
 ### 6.5 Final Validation
-- [ ] All 88 Phase 0 functions implemented and tested
-- [ ] Every function executes in < 1ms
-- [ ] All error types match spec: HttpError, JsonError, StorageError, LocationError, NotificationError, ConvertError
-- [ ] Full 100-iteration determinism test across all modules
-- [ ] `cargo clippy -- -D warnings` clean
-- [ ] README.md with module reference and architecture overview
+- [x] All 88 Phase 0 functions implemented and tested
+- [x] Every function executes in < 1ms
+- [x] All error types match spec: HttpError, JsonError, StorageError, LocationError, NotificationError, ConvertError
+- [x] Full 100-iteration determinism test across all modules
+- [x] `cargo clippy -- -D warnings` clean
+- [x] README.md with module reference and architecture overview
+---
+
+## Phase 7: Stdlib Alignment (Phase 0A)
+
+> Align stdlib function names and coverage with the Phase 0 spec (phase-0-stdlib-reference.md).
+> Resolves findings F1a–F1d from findings.md.
+
+### 7.1 Naming Alignment
+- [x] Rename `list.some` → `list.any` (spec's `phase-0-stdlib-reference.md` naming); `some` kept as backward-compat alias
+- [x] Update all internal references (function dispatch, tests, documentation)
+- [x] `storage.remove` — already absent from pepl-stdlib; removal from type checker is pepl Phase 9.7 (Step 24)
+- [x] Unit tests: `list.any` works, `list.some` alias works identically
+
+### 7.2 Missing Functions
+- [x] Implement `list.drop(xs, count) -> list<T>` — return all elements after first `count` (F1d)
+- [x] Unit tests: `list.drop` normal, edge (count=0, count > length, empty list, negative, fractional, wrong types) — 9 tests
+
+### 7.3 Extra Function Review
+- [x] Review `list.insert`, `list.update`, `list.find_index`, `list.zip`, `list.flatten` — these are in the type checker but not in the Phase 0 spec
+- [x] Decision: **KEEP** as spec extensions — useful, tested, harmless; documented in module doc comments
+- [ ] Align type checker `StdlibRegistry` with whatever decision is made (coordinate with pepl Phase 9.7)
+
+### 7.4 Phase 7 Validation
+- [x] All 31 Phase 0 spec functions present and tested (+ 5 spec extensions: insert, update, find_index, zip, flatten)
+- [x] No extra functions beyond spec boundary — extensions explicitly documented
+- [x] `storage.remove` already absent from pepl-stdlib
+- [x] `list.drop` implemented and tested (9 tests)
+- [x] `cargo test --workspace` — 512 tests pass (128 list tests, up from 117)
+- [x] `cargo clippy -- -D warnings` clean
+- [x] 100-iteration determinism test across all modules (includes list.drop + list.any)

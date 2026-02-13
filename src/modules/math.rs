@@ -42,8 +42,18 @@ impl StdlibModule for MathModule {
     fn has_function(&self, function: &str) -> bool {
         matches!(
             function,
-            "abs" | "min" | "max" | "floor" | "ceil" | "round" | "round_to"
-                | "pow" | "clamp" | "sqrt" | "PI" | "E"
+            "abs"
+                | "min"
+                | "max"
+                | "floor"
+                | "ceil"
+                | "round"
+                | "round_to"
+                | "pow"
+                | "clamp"
+                | "sqrt"
+                | "PI"
+                | "E"
         )
     }
 
@@ -76,7 +86,12 @@ fn expect_one_number(fn_name: &str, args: &[Value]) -> Result<f64, StdlibError> 
     }
     match &args[0] {
         Value::Number(n) => Ok(*n),
-        other => Err(StdlibError::type_mismatch(fn_name, 1, "number", other.type_name())),
+        other => Err(StdlibError::type_mismatch(
+            fn_name,
+            1,
+            "number",
+            other.type_name(),
+        )),
     }
 }
 
@@ -88,13 +103,23 @@ fn expect_two_numbers(fn_name: &str, args: &[Value]) -> Result<(f64, f64), Stdli
     let a = match &args[0] {
         Value::Number(n) => *n,
         other => {
-            return Err(StdlibError::type_mismatch(fn_name, 1, "number", other.type_name()));
+            return Err(StdlibError::type_mismatch(
+                fn_name,
+                1,
+                "number",
+                other.type_name(),
+            ));
         }
     };
     let b = match &args[1] {
         Value::Number(n) => *n,
         other => {
-            return Err(StdlibError::type_mismatch(fn_name, 2, "number", other.type_name()));
+            return Err(StdlibError::type_mismatch(
+                fn_name,
+                2,
+                "number",
+                other.type_name(),
+            ));
         }
     };
     Ok((a, b))
@@ -215,7 +240,10 @@ impl MathModule {
             Value::Number(n) => *n,
             other => {
                 return Err(StdlibError::type_mismatch(
-                    "math.clamp", 1, "number", other.type_name(),
+                    "math.clamp",
+                    1,
+                    "number",
+                    other.type_name(),
                 ));
             }
         };
@@ -223,7 +251,10 @@ impl MathModule {
             Value::Number(n) => *n,
             other => {
                 return Err(StdlibError::type_mismatch(
-                    "math.clamp", 2, "number", other.type_name(),
+                    "math.clamp",
+                    2,
+                    "number",
+                    other.type_name(),
                 ));
             }
         };
@@ -231,7 +262,10 @@ impl MathModule {
             Value::Number(n) => *n,
             other => {
                 return Err(StdlibError::type_mismatch(
-                    "math.clamp", 3, "number", other.type_name(),
+                    "math.clamp",
+                    3,
+                    "number",
+                    other.type_name(),
                 ));
             }
         };

@@ -104,16 +104,30 @@ impl RecordModule {
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-fn extract_record<'a>(func: &str, val: &'a Value, pos: usize) -> Result<&'a BTreeMap<String, Value>, StdlibError> {
+fn extract_record<'a>(
+    func: &str,
+    val: &'a Value,
+    pos: usize,
+) -> Result<&'a BTreeMap<String, Value>, StdlibError> {
     match val {
         Value::Record { fields, .. } => Ok(fields),
-        _ => Err(StdlibError::type_mismatch(func, pos, "record", val.type_name())),
+        _ => Err(StdlibError::type_mismatch(
+            func,
+            pos,
+            "record",
+            val.type_name(),
+        )),
     }
 }
 
 fn extract_string<'a>(func: &str, val: &'a Value, pos: usize) -> Result<&'a str, StdlibError> {
     match val {
         Value::String(s) => Ok(s),
-        _ => Err(StdlibError::type_mismatch(func, pos, "string", val.type_name())),
+        _ => Err(StdlibError::type_mismatch(
+            func,
+            pos,
+            "string",
+            val.type_name(),
+        )),
     }
 }

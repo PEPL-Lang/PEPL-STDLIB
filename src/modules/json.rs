@@ -70,7 +70,9 @@ impl JsonModule {
             return Err(StdlibError::wrong_args("json.stringify", 1, args.len()));
         }
         let json_val = value_to_json(&args[0]);
-        Ok(Value::String(serde_json::to_string(&json_val).unwrap_or_else(|_| "null".to_string())))
+        Ok(Value::String(
+            serde_json::to_string(&json_val).unwrap_or_else(|_| "null".to_string()),
+        ))
     }
 }
 
@@ -79,15 +81,16 @@ impl JsonModule {
 /// Convert a serde_json::Value to a PEPL Value, respecting depth limits.
 fn json_to_value(json: &serde_json::Value, depth: usize) -> Result<Value, String> {
     if depth > MAX_DEPTH {
-        return Err(format!("JSON nesting exceeds maximum depth of {}", MAX_DEPTH));
+        return Err(format!(
+            "JSON nesting exceeds maximum depth of {}",
+            MAX_DEPTH
+        ));
     }
 
     match json {
         serde_json::Value::Null => Ok(Value::Nil),
         serde_json::Value::Bool(b) => Ok(Value::Bool(*b)),
-        serde_json::Value::Number(n) => {
-            Ok(Value::Number(n.as_f64().unwrap_or(0.0)))
-        }
+        serde_json::Value::Number(n) => Ok(Value::Number(n.as_f64().unwrap_or(0.0))),
         serde_json::Value::String(s) => Ok(Value::String(s.clone())),
         serde_json::Value::Array(arr) => {
             let mut items = Vec::with_capacity(arr.len());
@@ -114,17 +117,14 @@ fn value_to_json(value: &Value) -> serde_json::Value {
         Value::Number(n) => {
             if n.is_finite() {
                 serde_json::Value::Number(
-                    serde_json::Number::from_f64(*n)
-                        .unwrap_or_else(|| serde_json::Number::from(0)),
+                    serde_json::Number::from_f64(*n).unwrap_or_else(|| serde_json::Number::from(0)),
                 )
             } else {
                 serde_json::Value::Null // NaN/Infinity → null
             }
         }
         Value::String(s) => serde_json::Value::String(s.clone()),
-        Value::List(items) => {
-            serde_json::Value::Array(items.iter().map(value_to_json).collect())
-        }
+        Value::List(items) => serde_json::Value::Array(items.iter().map(value_to_json).collect()),
         Value::Record { fields, .. } => {
             let obj: serde_json::Map<String, serde_json::Value> = fields
                 .iter()
@@ -152,14 +152,22 @@ fn value_to_json(value: &Value) -> serde_json::Value {
                 serde_json::Value::Object(obj)
             }
         },
-        Value::SumVariant { type_name, variant, fields } => {
+        Value::SumVariant {
+            type_name,
+            variant,
+            fields,
+        } => {
             let mut obj = serde_json::Map::new();
             obj.insert("_type".into(), serde_json::Value::String(type_name.clone()));
-            obj.insert("_variant".into(), serde_json::Value::String(variant.clone()));
+            obj.insert(
+                "_variant".into(),
+                serde_json::Value::String(variant.clone()),
+            );
             if !fields.is_empty() {
-                obj.insert("_fields".into(), serde_json::Value::Array(
-                    fields.iter().map(value_to_json).collect()
-                ));
+                obj.insert(
+                    "_fields".into(),
+                    serde_json::Value::Array(fields.iter().map(value_to_json).collect()),
+                );
             }
             serde_json::Value::Object(obj)
         }
@@ -172,6 +180,11 @@ fn value_to_json(value: &Value) -> serde_json::Value {
 fn extract_string<'a>(func: &str, val: &'a Value, pos: usize) -> Result<&'a str, StdlibError> {
     match val {
         Value::String(s) => Ok(s),
-        _ => Err(StdlibError::type_mismatch(func, pos, "string", val.type_name())),
+        _ => Err(StdlibError::type_mismatch(
+            func,
+            pos,
+            "string",
+            val.type_name(),
+        )),
     }
 }

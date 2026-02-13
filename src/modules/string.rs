@@ -109,7 +109,12 @@ fn expect_one_string(fn_name: &str, args: &[Value]) -> Result<String, StdlibErro
     }
     match &args[0] {
         Value::String(s) => Ok(s.clone()),
-        other => Err(StdlibError::type_mismatch(fn_name, 1, "string", other.type_name())),
+        other => Err(StdlibError::type_mismatch(
+            fn_name,
+            1,
+            "string",
+            other.type_name(),
+        )),
     }
 }
 
@@ -121,13 +126,23 @@ fn expect_two_strings(fn_name: &str, args: &[Value]) -> Result<(String, String),
     let a = match &args[0] {
         Value::String(s) => s.clone(),
         other => {
-            return Err(StdlibError::type_mismatch(fn_name, 1, "string", other.type_name()));
+            return Err(StdlibError::type_mismatch(
+                fn_name,
+                1,
+                "string",
+                other.type_name(),
+            ));
         }
     };
     let b = match &args[1] {
         Value::String(s) => s.clone(),
         other => {
-            return Err(StdlibError::type_mismatch(fn_name, 2, "string", other.type_name()));
+            return Err(StdlibError::type_mismatch(
+                fn_name,
+                2,
+                "string",
+                other.type_name(),
+            ));
         }
     };
     Ok((a, b))
@@ -144,19 +159,34 @@ fn expect_three_strings(
     let a = match &args[0] {
         Value::String(s) => s.clone(),
         other => {
-            return Err(StdlibError::type_mismatch(fn_name, 1, "string", other.type_name()));
+            return Err(StdlibError::type_mismatch(
+                fn_name,
+                1,
+                "string",
+                other.type_name(),
+            ));
         }
     };
     let b = match &args[1] {
         Value::String(s) => s.clone(),
         other => {
-            return Err(StdlibError::type_mismatch(fn_name, 2, "string", other.type_name()));
+            return Err(StdlibError::type_mismatch(
+                fn_name,
+                2,
+                "string",
+                other.type_name(),
+            ));
         }
     };
     let c = match &args[2] {
         Value::String(s) => s.clone(),
         other => {
-            return Err(StdlibError::type_mismatch(fn_name, 3, "string", other.type_name()));
+            return Err(StdlibError::type_mismatch(
+                fn_name,
+                3,
+                "string",
+                other.type_name(),
+            ));
         }
     };
     Ok((a, b, c))
@@ -198,7 +228,10 @@ impl StringModule {
             Value::String(s) => s.clone(),
             other => {
                 return Err(StdlibError::type_mismatch(
-                    "string.slice", 1, "string", other.type_name(),
+                    "string.slice",
+                    1,
+                    "string",
+                    other.type_name(),
                 ));
             }
         };
@@ -206,7 +239,10 @@ impl StringModule {
             Value::Number(n) => *n,
             other => {
                 return Err(StdlibError::type_mismatch(
-                    "string.slice", 2, "number", other.type_name(),
+                    "string.slice",
+                    2,
+                    "number",
+                    other.type_name(),
                 ));
             }
         };
@@ -214,7 +250,10 @@ impl StringModule {
             Value::Number(n) => *n,
             other => {
                 return Err(StdlibError::type_mismatch(
-                    "string.slice", 3, "number", other.type_name(),
+                    "string.slice",
+                    3,
+                    "number",
+                    other.type_name(),
                 ));
             }
         };
@@ -313,7 +352,10 @@ impl StringModule {
             Value::String(s) => s.clone(),
             other => {
                 return Err(StdlibError::type_mismatch(
-                    "string.pad_start", 1, "string", other.type_name(),
+                    "string.pad_start",
+                    1,
+                    "string",
+                    other.type_name(),
                 ));
             }
         };
@@ -321,7 +363,10 @@ impl StringModule {
             Value::Number(n) => *n,
             other => {
                 return Err(StdlibError::type_mismatch(
-                    "string.pad_start", 2, "number", other.type_name(),
+                    "string.pad_start",
+                    2,
+                    "number",
+                    other.type_name(),
                 ));
             }
         };
@@ -329,7 +374,10 @@ impl StringModule {
             Value::String(s) => s.clone(),
             other => {
                 return Err(StdlibError::type_mismatch(
-                    "string.pad_start", 3, "string", other.type_name(),
+                    "string.pad_start",
+                    3,
+                    "string",
+                    other.type_name(),
                 ));
             }
         };
@@ -357,7 +405,10 @@ impl StringModule {
             Value::String(s) => s.clone(),
             other => {
                 return Err(StdlibError::type_mismatch(
-                    "string.pad_end", 1, "string", other.type_name(),
+                    "string.pad_end",
+                    1,
+                    "string",
+                    other.type_name(),
                 ));
             }
         };
@@ -365,7 +416,10 @@ impl StringModule {
             Value::Number(n) => *n,
             other => {
                 return Err(StdlibError::type_mismatch(
-                    "string.pad_end", 2, "number", other.type_name(),
+                    "string.pad_end",
+                    2,
+                    "number",
+                    other.type_name(),
                 ));
             }
         };
@@ -373,7 +427,10 @@ impl StringModule {
             Value::String(s) => s.clone(),
             other => {
                 return Err(StdlibError::type_mismatch(
-                    "string.pad_end", 3, "string", other.type_name(),
+                    "string.pad_end",
+                    3,
+                    "string",
+                    other.type_name(),
                 ));
             }
         };
@@ -399,7 +456,10 @@ impl StringModule {
             Value::String(s) => s.clone(),
             other => {
                 return Err(StdlibError::type_mismatch(
-                    "string.repeat", 1, "string", other.type_name(),
+                    "string.repeat",
+                    1,
+                    "string",
+                    other.type_name(),
                 ));
             }
         };
@@ -407,7 +467,10 @@ impl StringModule {
             Value::Number(n) => *n,
             other => {
                 return Err(StdlibError::type_mismatch(
-                    "string.repeat", 2, "number", other.type_name(),
+                    "string.repeat",
+                    2,
+                    "number",
+                    other.type_name(),
                 ));
             }
         };
@@ -430,7 +493,10 @@ impl StringModule {
             Value::List(l) => l.clone(),
             other => {
                 return Err(StdlibError::type_mismatch(
-                    "string.join", 1, "list", other.type_name(),
+                    "string.join",
+                    1,
+                    "list",
+                    other.type_name(),
                 ));
             }
         };
@@ -438,7 +504,10 @@ impl StringModule {
             Value::String(s) => s.clone(),
             other => {
                 return Err(StdlibError::type_mismatch(
-                    "string.join", 2, "string", other.type_name(),
+                    "string.join",
+                    2,
+                    "string",
+                    other.type_name(),
                 ));
             }
         };
@@ -473,7 +542,10 @@ impl StringModule {
             Value::String(s) => s.clone(),
             other => {
                 return Err(StdlibError::type_mismatch(
-                    "string.format", 1, "string", other.type_name(),
+                    "string.format",
+                    1,
+                    "string",
+                    other.type_name(),
                 ));
             }
         };
@@ -481,7 +553,10 @@ impl StringModule {
             Value::Record { fields, .. } => fields.clone(),
             other => {
                 return Err(StdlibError::type_mismatch(
-                    "string.format", 2, "record", other.type_name(),
+                    "string.format",
+                    2,
+                    "record",
+                    other.type_name(),
                 ));
             }
         };

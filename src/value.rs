@@ -45,12 +45,7 @@ pub enum Value {
     },
 
     /// RGBA color value. Each component is in the range 0.0–1.0.
-    Color {
-        r: f64,
-        g: f64,
-        b: f64,
-        a: f64,
-    },
+    Color { r: f64, g: f64, b: f64, a: f64 },
 
     /// Result type for fallible operations (`Ok` or `Err`).
     Result(Box<ResultValue>),
@@ -82,7 +77,9 @@ pub struct StdlibFn(pub Arc<dyn Fn(Vec<Value>) -> Result<Value, StdlibError> + S
 
 impl StdlibFn {
     /// Create a new stdlib function from a closure.
-    pub fn new(f: impl Fn(Vec<Value>) -> Result<Value, StdlibError> + Send + Sync + 'static) -> Self {
+    pub fn new(
+        f: impl Fn(Vec<Value>) -> Result<Value, StdlibError> + Send + Sync + 'static,
+    ) -> Self {
         Self(Arc::new(f))
     }
 
@@ -137,16 +134,34 @@ impl PartialEq for Value {
             (Value::List(a), Value::List(b)) => a == b,
             // Structural equality for records — type_name is metadata, not identity
             (Value::Record { fields: a, .. }, Value::Record { fields: b, .. }) => a == b,
-            (Value::Color { r: r1, g: g1, b: b1, a: a1 },
-             Value::Color { r: r2, g: g2, b: b2, a: a2 }) => {
-                r1 == r2 && g1 == g2 && b1 == b2 && a1 == a2
-            }
+            (
+                Value::Color {
+                    r: r1,
+                    g: g1,
+                    b: b1,
+                    a: a1,
+                },
+                Value::Color {
+                    r: r2,
+                    g: g2,
+                    b: b2,
+                    a: a2,
+                },
+            ) => r1 == r2 && g1 == g2 && b1 == b2 && a1 == a2,
             (Value::Result(a), Value::Result(b)) => a == b,
             // Nominal equality for sum variants — same type + variant + fields
-            (Value::SumVariant { type_name: t1, variant: v1, fields: f1 },
-             Value::SumVariant { type_name: t2, variant: v2, fields: f2 }) => {
-                t1 == t2 && v1 == v2 && f1 == f2
-            }
+            (
+                Value::SumVariant {
+                    type_name: t1,
+                    variant: v1,
+                    fields: f1,
+                },
+                Value::SumVariant {
+                    type_name: t2,
+                    variant: v2,
+                    fields: f2,
+                },
+            ) => t1 == t2 && v1 == v2 && f1 == f2,
             // Function identity by Arc pointer equality
             (Value::Function(a), Value::Function(b)) => a == b,
             _ => false, // different variants are never equal
@@ -212,7 +227,9 @@ impl fmt::Display for Value {
                 }
                 write!(f, "}}")
             }
-            Value::SumVariant { variant, fields, .. } => {
+            Value::SumVariant {
+                variant, fields, ..
+            } => {
                 write!(f, "{variant}")?;
                 if !fields.is_empty() {
                     write!(f, "(")?;
@@ -249,8 +266,13 @@ impl Value {
             Value::Bool(_) => "bool",
             Value::Nil => "nil",
             Value::List(_) => "list",
-            Value::Record { type_name: Some(name), .. } => name.as_str(),
-            Value::Record { type_name: None, .. } => "record",
+            Value::Record {
+                type_name: Some(name),
+                ..
+            } => name.as_str(),
+            Value::Record {
+                type_name: None, ..
+            } => "record",
             Value::Color { .. } => "color",
             Value::Result(_) => "result",
             Value::SumVariant { type_name, .. } => type_name.as_str(),
@@ -285,12 +307,18 @@ impl Value {
 
     /// Create an anonymous record (no type name).
     pub fn record(fields: BTreeMap<String, Value>) -> Value {
-        Value::Record { type_name: None, fields }
+        Value::Record {
+            type_name: None,
+            fields,
+        }
     }
 
     /// Create a named record (e.g., `type Todo = { ... }`).
     pub fn named_record(type_name: impl Into<String>, fields: BTreeMap<String, Value>) -> Value {
-        Value::Record { type_name: Some(type_name.into()), fields }
+        Value::Record {
+            type_name: Some(type_name.into()),
+            fields,
+        }
     }
 
     /// Create a unit sum variant (no payload fields).
@@ -358,9 +386,11 @@ impl Value {
     /// Try to extract sum variant info: `(type_name, variant, fields)`.
     pub fn as_variant(&self) -> Option<(&str, &str, &[Value])> {
         match self {
-            Value::SumVariant { type_name, variant, fields } => {
-                Some((type_name, variant, fields))
-            }
+            Value::SumVariant {
+                type_name,
+                variant,
+                fields,
+            } => Some((type_name, variant, fields)),
             _ => None,
         }
     }
@@ -377,7 +407,10 @@ impl Value {
     /// Returns `None` for anonymous records and all other value types.
     pub fn declared_type_name(&self) -> Option<&str> {
         match self {
-            Value::Record { type_name: Some(name), .. } => Some(name),
+            Value::Record {
+                type_name: Some(name),
+                ..
+            } => Some(name),
             Value::SumVariant { type_name, .. } => Some(type_name),
             _ => None,
         }
@@ -418,6 +451,9 @@ impl From<bool> for Value {
 
 impl From<BTreeMap<String, Value>> for Value {
     fn from(fields: BTreeMap<String, Value>) -> Self {
-        Value::Record { type_name: None, fields }
+        Value::Record {
+            type_name: None,
+            fields,
+        }
     }
 }

@@ -121,7 +121,10 @@ fn record_values_deterministic_order() {
 fn record_empty_record_keys_and_values() {
     let m = RecordModule::new();
     let r = rec(vec![]);
-    assert_eq!(m.call("keys", vec![r.clone()]).unwrap(), Value::List(vec![]));
+    assert_eq!(
+        m.call("keys", vec![r.clone()]).unwrap(),
+        Value::List(vec![])
+    );
     assert_eq!(m.call("values", vec![r]).unwrap(), Value::List(vec![]));
 }
 
@@ -223,7 +226,9 @@ fn time_format_date() {
 fn time_format_datetime() {
     let m = TimeModule::new();
     // Epoch = 1970-01-01 00:00:00
-    let result = m.call("format", vec![n(0.0), s("YYYY-MM-DD HH:mm:ss")]).unwrap();
+    let result = m
+        .call("format", vec![n(0.0), s("YYYY-MM-DD HH:mm:ss")])
+        .unwrap();
     assert_eq!(result, s("1970-01-01 00:00:00"));
 }
 
@@ -312,14 +317,23 @@ fn convert_to_number_invalid_string() {
 #[test]
 fn convert_to_number_from_bool() {
     let m = ConvertModule::new();
-    assert_eq!(unwrap_ok(m.call("to_number", vec![b(true)]).unwrap()), n(1.0));
-    assert_eq!(unwrap_ok(m.call("to_number", vec![b(false)]).unwrap()), n(0.0));
+    assert_eq!(
+        unwrap_ok(m.call("to_number", vec![b(true)]).unwrap()),
+        n(1.0)
+    );
+    assert_eq!(
+        unwrap_ok(m.call("to_number", vec![b(false)]).unwrap()),
+        n(0.0)
+    );
 }
 
 #[test]
 fn convert_to_number_from_number() {
     let m = ConvertModule::new();
-    assert_eq!(unwrap_ok(m.call("to_number", vec![n(7.0)]).unwrap()), n(7.0));
+    assert_eq!(
+        unwrap_ok(m.call("to_number", vec![n(7.0)]).unwrap()),
+        n(7.0)
+    );
 }
 
 #[test]
@@ -332,8 +346,14 @@ fn convert_to_number_from_nil() {
 #[test]
 fn convert_parse_int_valid() {
     let m = ConvertModule::new();
-    assert_eq!(unwrap_ok(m.call("parse_int", vec![s("42")]).unwrap()), n(42.0));
-    assert_eq!(unwrap_ok(m.call("parse_int", vec![s("-10")]).unwrap()), n(-10.0));
+    assert_eq!(
+        unwrap_ok(m.call("parse_int", vec![s("42")]).unwrap()),
+        n(42.0)
+    );
+    assert_eq!(
+        unwrap_ok(m.call("parse_int", vec![s("-10")]).unwrap()),
+        n(-10.0)
+    );
 }
 
 #[test]
@@ -353,8 +373,14 @@ fn convert_parse_int_invalid() {
 #[test]
 fn convert_parse_float_valid() {
     let m = ConvertModule::new();
-    assert_eq!(unwrap_ok(m.call("parse_float", vec![s("3.14")]).unwrap()), n(3.14));
-    assert_eq!(unwrap_ok(m.call("parse_float", vec![s("42")]).unwrap()), n(42.0));
+    assert_eq!(
+        unwrap_ok(m.call("parse_float", vec![s("3.14")]).unwrap()),
+        n(3.14)
+    );
+    assert_eq!(
+        unwrap_ok(m.call("parse_float", vec![s("42")]).unwrap()),
+        n(42.0)
+    );
 }
 
 #[test]
@@ -370,7 +396,10 @@ fn convert_to_bool_truthy() {
     assert_eq!(m.call("to_bool", vec![n(1.0)]).unwrap(), b(true));
     assert_eq!(m.call("to_bool", vec![s("hello")]).unwrap(), b(true));
     assert_eq!(m.call("to_bool", vec![b(true)]).unwrap(), b(true));
-    assert_eq!(m.call("to_bool", vec![Value::List(vec![n(1.0)])]).unwrap(), b(true));
+    assert_eq!(
+        m.call("to_bool", vec![Value::List(vec![n(1.0)])]).unwrap(),
+        b(true)
+    );
 }
 
 #[test]
@@ -417,7 +446,9 @@ fn convert_has_function() {
 #[test]
 fn json_parse_object() {
     let m = JsonModule::new();
-    let result = m.call("parse", vec![s(r#"{"a": 1, "b": "hello"}"#)]).unwrap();
+    let result = m
+        .call("parse", vec![s(r#"{"a": 1, "b": "hello"}"#)])
+        .unwrap();
     assert!(is_ok(&result));
     let val = unwrap_ok(result);
     match &val {
@@ -441,9 +472,18 @@ fn json_parse_array() {
 fn json_parse_primitives() {
     let m = JsonModule::new();
     assert_eq!(unwrap_ok(m.call("parse", vec![s("42")]).unwrap()), n(42.0));
-    assert_eq!(unwrap_ok(m.call("parse", vec![s("true")]).unwrap()), b(true));
-    assert_eq!(unwrap_ok(m.call("parse", vec![s("null")]).unwrap()), Value::Nil);
-    assert_eq!(unwrap_ok(m.call("parse", vec![s(r#""hi""#)]).unwrap()), s("hi"));
+    assert_eq!(
+        unwrap_ok(m.call("parse", vec![s("true")]).unwrap()),
+        b(true)
+    );
+    assert_eq!(
+        unwrap_ok(m.call("parse", vec![s("null")]).unwrap()),
+        Value::Nil
+    );
+    assert_eq!(
+        unwrap_ok(m.call("parse", vec![s(r#""hi""#)]).unwrap()),
+        s("hi")
+    );
 }
 
 #[test]
@@ -479,7 +519,9 @@ fn json_stringify_record() {
 #[test]
 fn json_stringify_list() {
     let m = JsonModule::new();
-    let result = m.call("stringify", vec![Value::List(vec![n(1.0), n(2.0)])]).unwrap();
+    let result = m
+        .call("stringify", vec![Value::List(vec![n(1.0), n(2.0)])])
+        .unwrap();
     assert_eq!(result, s("[1.0,2.0]"));
 }
 
@@ -607,8 +649,14 @@ fn phase5_determinism_100_iterations() {
 
     for _ in 0..100 {
         // record
-        assert_eq!(record_mod.call("get", vec![r.clone(), s("x")]).unwrap(), n(1.0));
-        assert_eq!(record_mod.call("has", vec![r.clone(), s("y")]).unwrap(), b(true));
+        assert_eq!(
+            record_mod.call("get", vec![r.clone(), s("x")]).unwrap(),
+            n(1.0)
+        );
+        assert_eq!(
+            record_mod.call("has", vec![r.clone(), s("y")]).unwrap(),
+            b(true)
+        );
         assert_eq!(
             record_mod.call("keys", vec![r.clone()]).unwrap(),
             Value::List(vec![s("x"), s("y")])
@@ -616,14 +664,22 @@ fn phase5_determinism_100_iterations() {
 
         // time
         assert_eq!(time_mod.call("now", vec![]).unwrap(), n(0.0));
-        assert_eq!(time_mod.call("diff", vec![n(5000.0), n(3000.0)]).unwrap(), n(2000.0));
         assert_eq!(
-            time_mod.call("format", vec![n(ts), s("YYYY-MM-DD")]).unwrap(),
+            time_mod.call("diff", vec![n(5000.0), n(3000.0)]).unwrap(),
+            n(2000.0)
+        );
+        assert_eq!(
+            time_mod
+                .call("format", vec![n(ts), s("YYYY-MM-DD")])
+                .unwrap(),
             s("2024-01-15")
         );
 
         // convert
-        assert_eq!(convert_mod.call("to_string", vec![n(42.0)]).unwrap(), s("42"));
+        assert_eq!(
+            convert_mod.call("to_string", vec![n(42.0)]).unwrap(),
+            s("42")
+        );
         assert_eq!(convert_mod.call("to_bool", vec![n(0.0)]).unwrap(), b(false));
 
         // json
@@ -632,7 +688,10 @@ fn phase5_determinism_100_iterations() {
         assert_eq!(unwrap_ok(parsed), r);
 
         // timer
-        assert_eq!(timer_mod.call("start", vec![s("t"), n(100.0)]).unwrap(), s("t"));
+        assert_eq!(
+            timer_mod.call("start", vec![s("t"), n(100.0)]).unwrap(),
+            s("t")
+        );
         assert_eq!(timer_mod.call("stop_all", vec![]).unwrap(), Value::Nil);
     }
 }

@@ -27,7 +27,10 @@ impl StdlibModule for ConvertModule {
     }
 
     fn has_function(&self, function: &str) -> bool {
-        matches!(function, "to_string" | "to_number" | "parse_int" | "parse_float" | "to_bool")
+        matches!(
+            function,
+            "to_string" | "to_number" | "parse_int" | "parse_float" | "to_bool"
+        )
     }
 
     fn call(&self, function: &str, args: Vec<Value>) -> Result<Value, StdlibError> {
@@ -69,7 +72,9 @@ impl ConvertModule {
                 Ok(n) if n.is_finite() => Ok(Value::Number(n).ok()),
                 _ => Ok(Value::String(format!("cannot convert '{}' to number", s)).err()),
             },
-            other => Ok(Value::String(format!("cannot convert {} to number", other.type_name())).err()),
+            other => {
+                Ok(Value::String(format!("cannot convert {} to number", other.type_name())).err())
+            }
         }
     }
 
@@ -89,7 +94,11 @@ impl ConvertModule {
     /// convert.parse_float(s) → Result<number, string>
     fn parse_float(&self, args: Vec<Value>) -> Result<Value, StdlibError> {
         if args.len() != 1 {
-            return Err(StdlibError::wrong_args("convert.parse_float", 1, args.len()));
+            return Err(StdlibError::wrong_args(
+                "convert.parse_float",
+                1,
+                args.len(),
+            ));
         }
         let s = extract_string("convert.parse_float", &args[0], 1)?;
         match s.trim().parse::<f64>() {
@@ -113,6 +122,11 @@ impl ConvertModule {
 fn extract_string<'a>(func: &str, val: &'a Value, pos: usize) -> Result<&'a str, StdlibError> {
     match val {
         Value::String(s) => Ok(s),
-        _ => Err(StdlibError::type_mismatch(func, pos, "string", val.type_name())),
+        _ => Err(StdlibError::type_mismatch(
+            func,
+            pos,
+            "string",
+            val.type_name(),
+        )),
     }
 }

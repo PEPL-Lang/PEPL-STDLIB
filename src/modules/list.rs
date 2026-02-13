@@ -1,4 +1,4 @@
-//! The `list` module — 31 functions.
+//! The `list` module — 32 functions (31 spec + 5 extensions + `some` alias).
 //!
 //! All operations are **immutable** — they return new lists, never mutate.
 //!
@@ -42,16 +42,17 @@
 //! | `list.find`        | `(items: list, pred: fn(any) -> bool) -> any\|nil`      |
 //! | `list.find_index`  | `(items: list, pred: fn(any) -> bool) -> number`        |
 //! | `list.every`       | `(items: list, pred: fn(any) -> bool) -> bool`          |
-//! | `list.some`        | `(items: list, pred: fn(any) -> bool) -> bool`          |
+//! | `list.any`         | `(items: list, pred: fn(any) -> bool) -> bool`          |
 //! | `list.sort`        | `(items: list, cmp: fn(a, b) -> number) -> list`        |
 //! | `list.count`       | `(items: list, pred: fn(any) -> bool) -> number`        |
 //!
-//! ## Query (3) — also non-higher-order
+//! ## Query (4) — also non-higher-order
 //! | Function         | Signature                                  |
 //! |------------------|--------------------------------------------|
 //! | `list.contains`  | `(items: list, value) -> bool`             |
 //! | `list.zip`       | `(a: list, b: list) -> list`               |
 //! | `list.take`      | `(items: list, n: number) -> list`         |
+//! | `list.drop`      | `(items: list, n: number) -> list`         |
 
 use crate::error::StdlibError;
 use crate::module::StdlibModule;
@@ -85,13 +86,13 @@ impl StdlibModule for ListModule {
             // Access
             | "length" | "get" | "first" | "last" | "index_of"
             // Modification
-            | "append" | "prepend" | "insert" | "remove" | "update"
+            | "append" | "prepend" | "insert" | "remove" | "update" | "set"
             | "slice" | "concat" | "reverse" | "flatten" | "unique"
             // Higher-order
             | "map" | "filter" | "reduce" | "find" | "find_index"
-            | "every" | "some" | "sort" | "count"
+            | "every" | "any" | "some" | "sort" | "count"
             // Query
-            | "contains" | "zip" | "take"
+            | "contains" | "zip" | "take" | "drop"
         )
     }
 
@@ -113,7 +114,7 @@ impl StdlibModule for ListModule {
             "prepend" => self.prepend(args),
             "insert" => self.insert(args),
             "remove" => self.remove(args),
-            "update" => self.update(args),
+            "update" | "set" => self.update(args),
             "slice" => self.slice(args),
             "concat" => self.concat(args),
             "reverse" => self.reverse(args),
@@ -126,13 +127,14 @@ impl StdlibModule for ListModule {
             "find" => self.find(args),
             "find_index" => self.find_index(args),
             "every" => self.every(args),
-            "some" => self.some(args),
+            "any" | "some" => self.any(args),
             "sort" => self.sort(args),
             "count" => self.count(args),
             // Query
             "contains" => self.contains(args),
             "zip" => self.zip(args),
             "take" => self.take(args),
+            "drop" => self.drop_fn(args),
             _ => Err(StdlibError::unknown_function("list", function)),
         }
     }
@@ -552,13 +554,14 @@ impl ListModule {
         Ok(Value::Bool(true))
     }
 
-    /// `list.some(items, predicate) -> bool` — true if pred holds for any.
-    fn some(&self, args: Vec<Value>) -> Result<Value, StdlibError> {
+    /// `list.any(items, predicate) -> bool` — true if pred holds for any element.
+    /// Also available as `list.some` (backward-compat alias).
+    fn any(&self, args: Vec<Value>) -> Result<Value, StdlibError> {
         if args.len() != 2 {
-            return Err(StdlibError::wrong_args("list.some", 2, args.len()));
+            return Err(StdlibError::wrong_args("list.any", 2, args.len()));
         }
-        let items = extract_list("list.some", &args[0])?;
-        let pred = extract_function("list.some", &args[1], 2)?;
+        let items = extract_list("list.any", &args[0])?;
+        let pred = extract_function("list.any", &args[1], 2)?;
         for item in items {
             let result = pred.call(vec![item])?;
             if result.is_truthy() {
@@ -695,5 +698,24 @@ impl ListModule {
         }
         let n = (n as usize).min(items.len());
         Ok(Value::List(items[..n].to_vec()))
+    }
+
+    /// `list.drop(items, n) -> list` — returns all elements after the first n.
+    ///
+    /// Spec: `list.drop(xs: list<T>, count: number) -> list<T>`
+    /// If count >= length, returns empty list. If count <= 0, returns full list.
+    fn drop_fn(&self, args: Vec<Value>) -> Result<Value, StdlibError> {
+        if args.len() != 2 {
+            return Err(StdlibError::wrong_args("list.drop", 2, args.len()));
+        }
+        let items = extract_list("list.drop", &args[0])?;
+        let n = extract_number("list.drop", &args[1], 2)?;
+        if n.fract() != 0.0 || !n.is_finite() || n < 0.0 {
+            return Err(StdlibError::RuntimeError(
+                "list.drop: count must be a non-negative integer".to_string(),
+            ));
+        }
+        let n = (n as usize).min(items.len());
+        Ok(Value::List(items[n..].to_vec()))
     }
 }

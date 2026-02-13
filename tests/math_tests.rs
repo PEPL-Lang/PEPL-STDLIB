@@ -360,27 +360,42 @@ fn test_pow_infinity_trap() {
 
 #[test]
 fn test_clamp_within_range() {
-    assert_eq!(expect_num("clamp", vec![num(5.0), num(0.0), num(10.0)]), 5.0);
+    assert_eq!(
+        expect_num("clamp", vec![num(5.0), num(0.0), num(10.0)]),
+        5.0
+    );
 }
 
 #[test]
 fn test_clamp_below_min() {
-    assert_eq!(expect_num("clamp", vec![num(-5.0), num(0.0), num(10.0)]), 0.0);
+    assert_eq!(
+        expect_num("clamp", vec![num(-5.0), num(0.0), num(10.0)]),
+        0.0
+    );
 }
 
 #[test]
 fn test_clamp_above_max() {
-    assert_eq!(expect_num("clamp", vec![num(15.0), num(0.0), num(10.0)]), 10.0);
+    assert_eq!(
+        expect_num("clamp", vec![num(15.0), num(0.0), num(10.0)]),
+        10.0
+    );
 }
 
 #[test]
 fn test_clamp_at_min() {
-    assert_eq!(expect_num("clamp", vec![num(0.0), num(0.0), num(10.0)]), 0.0);
+    assert_eq!(
+        expect_num("clamp", vec![num(0.0), num(0.0), num(10.0)]),
+        0.0
+    );
 }
 
 #[test]
 fn test_clamp_at_max() {
-    assert_eq!(expect_num("clamp", vec![num(10.0), num(0.0), num(10.0)]), 10.0);
+    assert_eq!(
+        expect_num("clamp", vec![num(10.0), num(0.0), num(10.0)]),
+        10.0
+    );
 }
 
 #[test]
@@ -451,7 +466,10 @@ fn test_sqrt_negative_trap() {
     let err = call("sqrt", vec![num(-1.0)]).unwrap_err();
     assert!(matches!(err, StdlibError::RuntimeError(_)));
     let msg = err.to_string();
-    assert!(msg.contains("negative"), "error should mention negative: {msg}");
+    assert!(
+        msg.contains("negative"),
+        "error should mention negative: {msg}"
+    );
 }
 
 #[test]
@@ -589,30 +607,65 @@ fn test_determinism_100_iterations() {
     let ref_round = m.call("round", vec![num(2.5)]).unwrap();
     let ref_round_to = m.call("round_to", vec![num(3.14159), num(2.0)]).unwrap();
     let ref_pow = m.call("pow", vec![num(2.0), num(10.0)]).unwrap();
-    let ref_clamp = m.call("clamp", vec![num(15.0), num(0.0), num(10.0)]).unwrap();
+    let ref_clamp = m
+        .call("clamp", vec![num(15.0), num(0.0), num(10.0)])
+        .unwrap();
     let ref_sqrt = m.call("sqrt", vec![num(144.0)]).unwrap();
     let ref_pi = m.call("PI", vec![]).unwrap();
     let ref_e = m.call("E", vec![]).unwrap();
 
     for i in 0..100 {
-        assert_eq!(m.call("abs", vec![num(-42.5)]).unwrap(), ref_abs, "abs iter {i}");
-        assert_eq!(m.call("min", vec![num(3.0), num(7.0)]).unwrap(), ref_min, "min iter {i}");
-        assert_eq!(m.call("max", vec![num(3.0), num(7.0)]).unwrap(), ref_max, "max iter {i}");
-        assert_eq!(m.call("floor", vec![num(3.7)]).unwrap(), ref_floor, "floor iter {i}");
-        assert_eq!(m.call("ceil", vec![num(3.2)]).unwrap(), ref_ceil, "ceil iter {i}");
-        assert_eq!(m.call("round", vec![num(2.5)]).unwrap(), ref_round, "round iter {i}");
+        assert_eq!(
+            m.call("abs", vec![num(-42.5)]).unwrap(),
+            ref_abs,
+            "abs iter {i}"
+        );
+        assert_eq!(
+            m.call("min", vec![num(3.0), num(7.0)]).unwrap(),
+            ref_min,
+            "min iter {i}"
+        );
+        assert_eq!(
+            m.call("max", vec![num(3.0), num(7.0)]).unwrap(),
+            ref_max,
+            "max iter {i}"
+        );
+        assert_eq!(
+            m.call("floor", vec![num(3.7)]).unwrap(),
+            ref_floor,
+            "floor iter {i}"
+        );
+        assert_eq!(
+            m.call("ceil", vec![num(3.2)]).unwrap(),
+            ref_ceil,
+            "ceil iter {i}"
+        );
+        assert_eq!(
+            m.call("round", vec![num(2.5)]).unwrap(),
+            ref_round,
+            "round iter {i}"
+        );
         assert_eq!(
             m.call("round_to", vec![num(3.14159), num(2.0)]).unwrap(),
             ref_round_to,
             "round_to iter {i}"
         );
-        assert_eq!(m.call("pow", vec![num(2.0), num(10.0)]).unwrap(), ref_pow, "pow iter {i}");
         assert_eq!(
-            m.call("clamp", vec![num(15.0), num(0.0), num(10.0)]).unwrap(),
+            m.call("pow", vec![num(2.0), num(10.0)]).unwrap(),
+            ref_pow,
+            "pow iter {i}"
+        );
+        assert_eq!(
+            m.call("clamp", vec![num(15.0), num(0.0), num(10.0)])
+                .unwrap(),
             ref_clamp,
             "clamp iter {i}"
         );
-        assert_eq!(m.call("sqrt", vec![num(144.0)]).unwrap(), ref_sqrt, "sqrt iter {i}");
+        assert_eq!(
+            m.call("sqrt", vec![num(144.0)]).unwrap(),
+            ref_sqrt,
+            "sqrt iter {i}"
+        );
         assert_eq!(m.call("PI", vec![]).unwrap(), ref_pi, "PI iter {i}");
         assert_eq!(m.call("E", vec![]).unwrap(), ref_e, "E iter {i}");
     }

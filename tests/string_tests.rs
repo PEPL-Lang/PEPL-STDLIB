@@ -60,9 +60,26 @@ fn test_module_name() {
 fn test_has_function_known() {
     let m = string_mod();
     for f in &[
-        "length", "concat", "contains", "slice", "trim", "split", "to_upper", "to_lower",
-        "starts_with", "ends_with", "replace", "replace_all", "pad_start", "pad_end", "repeat",
-        "join", "format", "from", "is_empty", "index_of",
+        "length",
+        "concat",
+        "contains",
+        "slice",
+        "trim",
+        "split",
+        "to_upper",
+        "to_lower",
+        "starts_with",
+        "ends_with",
+        "replace",
+        "replace_all",
+        "pad_start",
+        "pad_end",
+        "repeat",
+        "join",
+        "format",
+        "from",
+        "is_empty",
+        "index_of",
     ] {
         assert!(m.has_function(f), "string should have function {f}");
     }
@@ -123,7 +140,10 @@ fn test_length_wrong_type() {
 
 #[test]
 fn test_concat_basic() {
-    assert_eq!(expect_str("concat", vec![s("hello"), s(" world")]), "hello world");
+    assert_eq!(
+        expect_str("concat", vec![s("hello"), s(" world")]),
+        "hello world"
+    );
 }
 
 #[test]
@@ -176,43 +196,70 @@ fn test_contains_case_sensitive() {
 
 #[test]
 fn test_slice_basic() {
-    assert_eq!(expect_str("slice", vec![s("hello"), num(1.0), num(4.0)]), "ell");
+    assert_eq!(
+        expect_str("slice", vec![s("hello"), num(1.0), num(4.0)]),
+        "ell"
+    );
 }
 
 #[test]
 fn test_slice_from_start() {
-    assert_eq!(expect_str("slice", vec![s("hello"), num(0.0), num(3.0)]), "hel");
+    assert_eq!(
+        expect_str("slice", vec![s("hello"), num(0.0), num(3.0)]),
+        "hel"
+    );
 }
 
 #[test]
 fn test_slice_to_end() {
-    assert_eq!(expect_str("slice", vec![s("hello"), num(2.0), num(5.0)]), "llo");
+    assert_eq!(
+        expect_str("slice", vec![s("hello"), num(2.0), num(5.0)]),
+        "llo"
+    );
 }
 
 #[test]
 fn test_slice_empty_range() {
-    assert_eq!(expect_str("slice", vec![s("hello"), num(2.0), num(2.0)]), "");
+    assert_eq!(
+        expect_str("slice", vec![s("hello"), num(2.0), num(2.0)]),
+        ""
+    );
 }
 
 #[test]
 fn test_slice_reversed_range() {
-    assert_eq!(expect_str("slice", vec![s("hello"), num(4.0), num(2.0)]), "");
+    assert_eq!(
+        expect_str("slice", vec![s("hello"), num(4.0), num(2.0)]),
+        ""
+    );
 }
 
 #[test]
 fn test_slice_out_of_bounds_clamps() {
-    assert_eq!(expect_str("slice", vec![s("hello"), num(0.0), num(100.0)]), "hello");
+    assert_eq!(
+        expect_str("slice", vec![s("hello"), num(0.0), num(100.0)]),
+        "hello"
+    );
 }
 
 #[test]
 fn test_slice_negative_start_clamps() {
-    assert_eq!(expect_str("slice", vec![s("hello"), num(-5.0), num(3.0)]), "hel");
+    assert_eq!(
+        expect_str("slice", vec![s("hello"), num(-5.0), num(3.0)]),
+        "hel"
+    );
 }
 
 #[test]
 fn test_slice_unicode() {
-    assert_eq!(expect_str("slice", vec![s("café"), num(0.0), num(3.0)]), "caf");
-    assert_eq!(expect_str("slice", vec![s("café"), num(3.0), num(4.0)]), "é");
+    assert_eq!(
+        expect_str("slice", vec![s("café"), num(0.0), num(3.0)]),
+        "caf"
+    );
+    assert_eq!(
+        expect_str("slice", vec![s("café"), num(3.0), num(4.0)]),
+        "é"
+    );
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -295,7 +342,10 @@ fn test_to_upper_basic() {
 
 #[test]
 fn test_to_upper_mixed() {
-    assert_eq!(expect_str("to_upper", vec![s("Hello World")]), "HELLO WORLD");
+    assert_eq!(
+        expect_str("to_upper", vec![s("Hello World")]),
+        "HELLO WORLD"
+    );
 }
 
 #[test]
@@ -310,7 +360,10 @@ fn test_to_lower_basic() {
 
 #[test]
 fn test_to_lower_mixed() {
-    assert_eq!(expect_str("to_lower", vec![s("Hello World")]), "hello world");
+    assert_eq!(
+        expect_str("to_lower", vec![s("Hello World")]),
+        "hello world"
+    );
 }
 
 #[test]
@@ -324,12 +377,18 @@ fn test_to_lower_empty() {
 
 #[test]
 fn test_starts_with_true() {
-    assert!(expect_bool("starts_with", vec![s("hello world"), s("hello")]));
+    assert!(expect_bool(
+        "starts_with",
+        vec![s("hello world"), s("hello")]
+    ));
 }
 
 #[test]
 fn test_starts_with_false() {
-    assert!(!expect_bool("starts_with", vec![s("hello world"), s("world")]));
+    assert!(!expect_bool(
+        "starts_with",
+        vec![s("hello world"), s("world")]
+    ));
 }
 
 #[test]
@@ -349,7 +408,10 @@ fn test_ends_with_true() {
 
 #[test]
 fn test_ends_with_false() {
-    assert!(!expect_bool("ends_with", vec![s("hello world"), s("hello")]));
+    assert!(!expect_bool(
+        "ends_with",
+        vec![s("hello world"), s("hello")]
+    ));
 }
 
 #[test]
@@ -577,7 +639,10 @@ fn test_join_non_string_items_error() {
 fn test_format_basic() {
     let mut fields = BTreeMap::new();
     fields.insert("name".to_string(), s("Alice"));
-    let record = Value::Record { type_name: None, fields };
+    let record = Value::Record {
+        type_name: None,
+        fields,
+    };
     assert_eq!(
         expect_str("format", vec![s("Hello, {name}!"), record]),
         "Hello, Alice!"
@@ -589,7 +654,10 @@ fn test_format_multiple_placeholders() {
     let mut fields = BTreeMap::new();
     fields.insert("first".to_string(), s("Jane"));
     fields.insert("last".to_string(), s("Doe"));
-    let record = Value::Record { type_name: None, fields };
+    let record = Value::Record {
+        type_name: None,
+        fields,
+    };
     assert_eq!(
         expect_str("format", vec![s("{first} {last}"), record]),
         "Jane Doe"
@@ -600,7 +668,10 @@ fn test_format_multiple_placeholders() {
 fn test_format_number_value() {
     let mut fields = BTreeMap::new();
     fields.insert("count".to_string(), num(42.0));
-    let record = Value::Record { type_name: None, fields };
+    let record = Value::Record {
+        type_name: None,
+        fields,
+    };
     assert_eq!(
         expect_str("format", vec![s("Count: {count}"), record]),
         "Count: 42"
@@ -610,7 +681,10 @@ fn test_format_number_value() {
 #[test]
 fn test_format_missing_placeholder() {
     let fields = BTreeMap::new();
-    let record = Value::Record { type_name: None, fields };
+    let record = Value::Record {
+        type_name: None,
+        fields,
+    };
     assert_eq!(
         expect_str("format", vec![s("Hello, {name}!"), record]),
         "Hello, {name}!"
@@ -620,22 +694,22 @@ fn test_format_missing_placeholder() {
 #[test]
 fn test_format_no_placeholders() {
     let fields = BTreeMap::new();
-    let record = Value::Record { type_name: None, fields };
-    assert_eq!(
-        expect_str("format", vec![s("Hello!"), record]),
-        "Hello!"
-    );
+    let record = Value::Record {
+        type_name: None,
+        fields,
+    };
+    assert_eq!(expect_str("format", vec![s("Hello!"), record]), "Hello!");
 }
 
 #[test]
 fn test_format_repeated_placeholder() {
     let mut fields = BTreeMap::new();
     fields.insert("x".to_string(), s("!"));
-    let record = Value::Record { type_name: None, fields };
-    assert_eq!(
-        expect_str("format", vec![s("{x}{x}{x}"), record]),
-        "!!!"
-    );
+    let record = Value::Record {
+        type_name: None,
+        fields,
+    };
+    assert_eq!(expect_str("format", vec![s("{x}{x}{x}"), record]), "!!!");
 }
 
 #[test]
@@ -711,7 +785,10 @@ fn test_is_empty_whitespace_is_not_empty() {
 
 #[test]
 fn test_index_of_found() {
-    assert_eq!(expect_num("index_of", vec![s("hello world"), s("world")]), 6.0);
+    assert_eq!(
+        expect_num("index_of", vec![s("hello world"), s("world")]),
+        6.0
+    );
 }
 
 #[test]
@@ -747,7 +824,10 @@ fn test_index_of_unicode() {
 #[test]
 fn test_unicode_slice_emoji() {
     // "Hi 😀!" — emoji at char index 3
-    assert_eq!(expect_str("slice", vec![s("Hi 😀!"), num(3.0), num(4.0)]), "😀");
+    assert_eq!(
+        expect_str("slice", vec![s("Hi 😀!"), num(3.0), num(4.0)]),
+        "😀"
+    );
 }
 
 #[test]
@@ -819,13 +899,18 @@ fn test_determinism_100_iterations() {
 
     let mut fields = BTreeMap::new();
     fields.insert("name".to_string(), s("World"));
-    let rec = Value::Record { type_name: None, fields };
+    let rec = Value::Record {
+        type_name: None,
+        fields,
+    };
     let items = Value::List(vec![s("a"), s("b"), s("c")]);
 
     let ref_length = m.call("length", vec![s("hello")]).unwrap();
     let ref_concat = m.call("concat", vec![s("a"), s("b")]).unwrap();
     let ref_contains = m.call("contains", vec![s("abc"), s("b")]).unwrap();
-    let ref_slice = m.call("slice", vec![s("hello"), num(1.0), num(4.0)]).unwrap();
+    let ref_slice = m
+        .call("slice", vec![s("hello"), num(1.0), num(4.0)])
+        .unwrap();
     let ref_trim = m.call("trim", vec![s("  hi  ")]).unwrap();
     let ref_split = m.call("split", vec![s("a,b"), s(",")]).unwrap();
     let ref_upper = m.call("to_upper", vec![s("hello")]).unwrap();
@@ -833,7 +918,9 @@ fn test_determinism_100_iterations() {
     let ref_starts = m.call("starts_with", vec![s("hello"), s("he")]).unwrap();
     let ref_ends = m.call("ends_with", vec![s("hello"), s("lo")]).unwrap();
     let ref_replace = m.call("replace", vec![s("aab"), s("a"), s("x")]).unwrap();
-    let ref_replace_all = m.call("replace_all", vec![s("aab"), s("a"), s("x")]).unwrap();
+    let ref_replace_all = m
+        .call("replace_all", vec![s("aab"), s("a"), s("x")])
+        .unwrap();
     let ref_pad_start = m.call("pad_start", vec![s("1"), num(3.0), s("0")]).unwrap();
     let ref_pad_end = m.call("pad_end", vec![s("1"), num(3.0), s("0")]).unwrap();
     let ref_repeat = m.call("repeat", vec![s("ab"), num(2.0)]).unwrap();
@@ -844,25 +931,107 @@ fn test_determinism_100_iterations() {
     let ref_index = m.call("index_of", vec![s("hello"), s("ll")]).unwrap();
 
     for i in 0..100 {
-        assert_eq!(m.call("length", vec![s("hello")]).unwrap(), ref_length, "length iter {i}");
-        assert_eq!(m.call("concat", vec![s("a"), s("b")]).unwrap(), ref_concat, "concat iter {i}");
-        assert_eq!(m.call("contains", vec![s("abc"), s("b")]).unwrap(), ref_contains, "contains iter {i}");
-        assert_eq!(m.call("slice", vec![s("hello"), num(1.0), num(4.0)]).unwrap(), ref_slice, "slice iter {i}");
-        assert_eq!(m.call("trim", vec![s("  hi  ")]).unwrap(), ref_trim, "trim iter {i}");
-        assert_eq!(m.call("split", vec![s("a,b"), s(",")]).unwrap(), ref_split, "split iter {i}");
-        assert_eq!(m.call("to_upper", vec![s("hello")]).unwrap(), ref_upper, "to_upper iter {i}");
-        assert_eq!(m.call("to_lower", vec![s("HELLO")]).unwrap(), ref_lower, "to_lower iter {i}");
-        assert_eq!(m.call("starts_with", vec![s("hello"), s("he")]).unwrap(), ref_starts, "starts_with iter {i}");
-        assert_eq!(m.call("ends_with", vec![s("hello"), s("lo")]).unwrap(), ref_ends, "ends_with iter {i}");
-        assert_eq!(m.call("replace", vec![s("aab"), s("a"), s("x")]).unwrap(), ref_replace, "replace iter {i}");
-        assert_eq!(m.call("replace_all", vec![s("aab"), s("a"), s("x")]).unwrap(), ref_replace_all, "replace_all iter {i}");
-        assert_eq!(m.call("pad_start", vec![s("1"), num(3.0), s("0")]).unwrap(), ref_pad_start, "pad_start iter {i}");
-        assert_eq!(m.call("pad_end", vec![s("1"), num(3.0), s("0")]).unwrap(), ref_pad_end, "pad_end iter {i}");
-        assert_eq!(m.call("repeat", vec![s("ab"), num(2.0)]).unwrap(), ref_repeat, "repeat iter {i}");
-        assert_eq!(m.call("join", vec![items.clone(), s(",")]).unwrap(), ref_join, "join iter {i}");
-        assert_eq!(m.call("format", vec![s("Hi {name}"), rec.clone()]).unwrap(), ref_format, "format iter {i}");
-        assert_eq!(m.call("from", vec![num(42.0)]).unwrap(), ref_from, "from iter {i}");
-        assert_eq!(m.call("is_empty", vec![s("")]).unwrap(), ref_empty, "is_empty iter {i}");
-        assert_eq!(m.call("index_of", vec![s("hello"), s("ll")]).unwrap(), ref_index, "index_of iter {i}");
+        assert_eq!(
+            m.call("length", vec![s("hello")]).unwrap(),
+            ref_length,
+            "length iter {i}"
+        );
+        assert_eq!(
+            m.call("concat", vec![s("a"), s("b")]).unwrap(),
+            ref_concat,
+            "concat iter {i}"
+        );
+        assert_eq!(
+            m.call("contains", vec![s("abc"), s("b")]).unwrap(),
+            ref_contains,
+            "contains iter {i}"
+        );
+        assert_eq!(
+            m.call("slice", vec![s("hello"), num(1.0), num(4.0)])
+                .unwrap(),
+            ref_slice,
+            "slice iter {i}"
+        );
+        assert_eq!(
+            m.call("trim", vec![s("  hi  ")]).unwrap(),
+            ref_trim,
+            "trim iter {i}"
+        );
+        assert_eq!(
+            m.call("split", vec![s("a,b"), s(",")]).unwrap(),
+            ref_split,
+            "split iter {i}"
+        );
+        assert_eq!(
+            m.call("to_upper", vec![s("hello")]).unwrap(),
+            ref_upper,
+            "to_upper iter {i}"
+        );
+        assert_eq!(
+            m.call("to_lower", vec![s("HELLO")]).unwrap(),
+            ref_lower,
+            "to_lower iter {i}"
+        );
+        assert_eq!(
+            m.call("starts_with", vec![s("hello"), s("he")]).unwrap(),
+            ref_starts,
+            "starts_with iter {i}"
+        );
+        assert_eq!(
+            m.call("ends_with", vec![s("hello"), s("lo")]).unwrap(),
+            ref_ends,
+            "ends_with iter {i}"
+        );
+        assert_eq!(
+            m.call("replace", vec![s("aab"), s("a"), s("x")]).unwrap(),
+            ref_replace,
+            "replace iter {i}"
+        );
+        assert_eq!(
+            m.call("replace_all", vec![s("aab"), s("a"), s("x")])
+                .unwrap(),
+            ref_replace_all,
+            "replace_all iter {i}"
+        );
+        assert_eq!(
+            m.call("pad_start", vec![s("1"), num(3.0), s("0")]).unwrap(),
+            ref_pad_start,
+            "pad_start iter {i}"
+        );
+        assert_eq!(
+            m.call("pad_end", vec![s("1"), num(3.0), s("0")]).unwrap(),
+            ref_pad_end,
+            "pad_end iter {i}"
+        );
+        assert_eq!(
+            m.call("repeat", vec![s("ab"), num(2.0)]).unwrap(),
+            ref_repeat,
+            "repeat iter {i}"
+        );
+        assert_eq!(
+            m.call("join", vec![items.clone(), s(",")]).unwrap(),
+            ref_join,
+            "join iter {i}"
+        );
+        assert_eq!(
+            m.call("format", vec![s("Hi {name}"), rec.clone()]).unwrap(),
+            ref_format,
+            "format iter {i}"
+        );
+        assert_eq!(
+            m.call("from", vec![num(42.0)]).unwrap(),
+            ref_from,
+            "from iter {i}"
+        );
+        assert_eq!(
+            m.call("is_empty", vec![s("")]).unwrap(),
+            ref_empty,
+            "is_empty iter {i}"
+        );
+        assert_eq!(
+            m.call("index_of", vec![s("hello"), s("ll")]).unwrap(),
+            ref_index,
+            "index_of iter {i}"
+        );
     }
 }

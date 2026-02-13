@@ -31,6 +31,17 @@ pub enum StdlibError {
     /// Generic runtime error (e.g., NaN would be produced, division by zero).
     #[error("{0}")]
     RuntimeError(String),
+
+    /// Capability call — cannot be executed locally, must be routed to host.
+    /// The caller should use `cap_id` and `fn_id` for `env.host_call` dispatch.
+    #[error("{module}.{function}: capability call requires host (cap_id={cap_id}, fn_id={fn_id})")]
+    CapabilityCall {
+        module: String,
+        function: String,
+        cap_id: u32,
+        fn_id: u32,
+        args: Vec<crate::value::Value>,
+    },
 }
 
 impl StdlibError {
@@ -44,12 +55,7 @@ impl StdlibError {
     }
 
     /// Create a `TypeMismatch` error.
-    pub fn type_mismatch(
-        function: &str,
-        position: usize,
-        expected: &str,
-        got: &str,
-    ) -> Self {
+    pub fn type_mismatch(function: &str, position: usize, expected: &str, got: &str) -> Self {
         Self::TypeMismatch {
             function: function.to_string(),
             position,
@@ -63,6 +69,23 @@ impl StdlibError {
         Self::UnknownFunction {
             module: module.to_string(),
             function: function.to_string(),
+        }
+    }
+
+    /// Create a `CapabilityCall` error — signals that this call must be routed to the host.
+    pub fn capability_call(
+        module: &str,
+        function: &str,
+        cap_id: u32,
+        fn_id: u32,
+        args: Vec<crate::value::Value>,
+    ) -> Self {
+        Self::CapabilityCall {
+            module: module.to_string(),
+            function: function.to_string(),
+            cap_id,
+            fn_id,
+            args,
         }
     }
 }

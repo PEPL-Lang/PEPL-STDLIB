@@ -2,9 +2,9 @@
 
 The PEPL standard library — deterministic, pure functions for PEPL programs.
 
-**Status:** Phase 5 complete (all 9 pure stdlib modules). See [ROADMAP.md](ROADMAP.md) for progress.
+**Status:** Phase 6 complete (all 9 pure modules + 4 capability modules, 88 functions). See [ROADMAP.md](ROADMAP.md) for progress.
 
-## Modules
+## Pure Modules
 
 | Module | Functions | Status |
 |--------|-----------|--------|
@@ -18,14 +18,25 @@ The PEPL standard library — deterministic, pure functions for PEPL programs.
 | `json` | 2 (parse, stringify) | ✅ Done |
 | `timer` | 4 (start, start_once, stop, stop_all) | ✅ Done |
 
+## Capability Modules
+
+| Module | Functions | cap_id | Status |
+|--------|-----------|--------|--------|
+| `http` | 5 (get, post, put, patch, delete) | 1 | ✅ Done |
+| `storage` | 4 (get, set, delete, keys) | 2 | ✅ Done |
+| `location` | 1 (current) | 3 | ✅ Done |
+| `notifications` | 1 (send) | 4 | ✅ Done |
+
 ## Tests
 
-450 tests:
+501 tests:
 - core: 75
 - math: 85
 - string: 109
 - list: 117
 - record + time + convert + json + timer: 64
+- capability (http + storage + location + notifications): 50
+- integration: 1
 
 ## Key Design Choices
 

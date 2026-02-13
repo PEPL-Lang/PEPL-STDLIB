@@ -93,13 +93,23 @@ impl TimerModule {
 fn extract_string<'a>(func: &str, val: &'a Value, pos: usize) -> Result<&'a str, StdlibError> {
     match val {
         Value::String(s) => Ok(s),
-        _ => Err(StdlibError::type_mismatch(func, pos, "string", val.type_name())),
+        _ => Err(StdlibError::type_mismatch(
+            func,
+            pos,
+            "string",
+            val.type_name(),
+        )),
     }
 }
 
 fn extract_number(func: &str, val: &Value, pos: usize) -> Result<f64, StdlibError> {
     match val {
         Value::Number(n) => Ok(*n),
-        _ => Err(StdlibError::type_mismatch(func, pos, "number", val.type_name())),
+        _ => Err(StdlibError::type_mismatch(
+            func,
+            pos,
+            "number",
+            val.type_name(),
+        )),
     }
 }
