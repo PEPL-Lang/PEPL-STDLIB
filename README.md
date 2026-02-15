@@ -2,16 +2,16 @@
 
 The PEPL standard library — deterministic, pure functions for PEPL programs.
 
-**Status:** Phase 6 complete (all 9 pure modules + 4 capability modules, 88 functions). See [ROADMAP.md](ROADMAP.md) for progress.
+**Status:** Phase 7 complete (all 9 pure modules + 4 capability modules, 100 functions + 2 constants). See [ROADMAP.md](ROADMAP.md) for progress.
 
 ## Pure Modules
 
 | Module | Functions | Status |
 |--------|-----------|--------|
-| `core` | 4 (type_of, to_string, print, assert) | ✅ Done |
+| `core` | 4 (log, assert, type_of, capability) | ✅ Done |
 | `math` | 10 + 2 constants (PI, E) | ✅ Done |
 | `string` | 20 (length, concat, contains, slice, trim, split, etc.) | ✅ Done |
-| `list` | 31 (construction, access, modification, higher-order, query) | ✅ Done |
+| `list` | 34 (construction, access, modification, higher-order, query) | ✅ Done |
 | `record` | 5 (get, set, has, keys, values) | ✅ Done |
 | `time` | 5 (now, format, diff, day_of_week, start_of_day) | ✅ Done |
 | `convert` | 5 (to_string, to_number, parse_int, parse_float, to_bool) | ✅ Done |
