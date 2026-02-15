@@ -1,5 +1,8 @@
 # pepl-stdlib
 
+[![crates.io](https://img.shields.io/crates/v/pepl-stdlib.svg)](https://crates.io/crates/pepl-stdlib)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 The PEPL standard library — deterministic, pure functions for PEPL programs.
 
 **Status:** Phase 7 complete (all 9 pure modules + 4 capability modules, 100 functions + 2 constants). See [ROADMAP.md](ROADMAP.md) for progress.
@@ -29,7 +32,7 @@ The PEPL standard library — deterministic, pure functions for PEPL programs.
 
 ## Tests
 
-501 tests:
+512 tests:
 - core: 75
 - math: 85
 - string: 109
