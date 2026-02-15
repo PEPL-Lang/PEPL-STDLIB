@@ -1,6 +1,6 @@
 # ROADMAP — pepl-stdlib (Standard Library)
 
-> 88 Phase 0 functions across 9 core modules + 4 capability modules.
+> 100 Phase 0 functions + 2 constants across 9 core modules + 4 capability modules.
 > All core functions are pure, deterministic, and execute in < 1ms.
 > Written in Rust, compiled alongside the compiler.
 
@@ -81,9 +81,9 @@
 
 ## Phase 4: `list` Module
 
-> **Note:** The canonical set of 31 list functions is defined by the compiler's
+> **Note:** The canonical set of 34 list functions is defined by the compiler's
 > type-checker registrations (`pepl-compiler/src/stdlib.rs`). This phase
-> implements exactly those 31 functions.
+> implements exactly those 34 functions.
 
 ### 4.1 List Construction (4 functions)
 - [x] `list.empty() -> list`
@@ -129,7 +129,7 @@
 - [x] `list.take(items, n) -> list`
 
 ### 4.6 Testing & Validation
-- [x] Unit tests for all 31 functions (normal, edge, error cases)
+- [x] Unit tests for all 34 functions (normal, edge, error cases)
 - [x] Higher-order tests with real callback functions
 - [x] Integration tests (chaining filter→map, range→reduce, etc.)
 - [x] Sort stability & comparator error propagation tests
@@ -216,7 +216,7 @@
 - [x] Unit tests
 
 ### 6.5 Final Validation
-- [x] All 88 Phase 0 functions implemented and tested
+- [x] All 100 Phase 0 functions implemented and tested
 - [x] Every function executes in < 1ms
 - [x] All error types match spec: HttpError, JsonError, StorageError, LocationError, NotificationError, ConvertError
 - [x] Full 100-iteration determinism test across all modules
@@ -242,7 +242,7 @@
 ### 7.3 Extra Function Review
 - [x] Review `list.insert`, `list.update`, `list.find_index`, `list.zip`, `list.flatten` — these are in the type checker but not in the Phase 0 spec
 - [x] Decision: **KEEP** as spec extensions — useful, tested, harmless; documented in module doc comments
-- [ ] Align type checker `StdlibRegistry` with whatever decision is made (coordinate with pepl Phase 9.7)
+- [x] Align type checker `StdlibRegistry` with whatever decision is made (coordinate with pepl Phase 9.7)
 
 ### 7.4 Phase 7 Validation
 - [x] All 31 Phase 0 spec functions present and tested (+ 5 spec extensions: insert, update, find_index, zip, flatten)
