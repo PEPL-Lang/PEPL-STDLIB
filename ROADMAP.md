@@ -4,7 +4,7 @@
 > All core functions are pure, deterministic, and execute in < 1ms.
 > Written in Rust, compiled alongside the compiler.
 
-> See `ORCHESTRATION.md` for cross-repo sequencing.
+> See `ORCHESTRATION.md` in the [`.github`](https://github.com/PEPL-Lang/.github) repo for cross-repo sequencing.
 
 ---
 
