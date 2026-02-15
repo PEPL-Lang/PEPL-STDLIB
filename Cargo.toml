@@ -5,6 +5,7 @@ edition = "2021"
 license = "MIT"
 repository = "https://github.com/pepl-lang/pepl-stdlib"
 description = "Standard library for the PEPL language"
+authors = ["PEPL Team"]
 
 [dependencies]
 thiserror = "2"
