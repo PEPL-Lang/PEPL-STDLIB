@@ -1,6 +1,7 @@
 # pepl-stdlib
 
 [![crates.io](https://img.shields.io/crates/v/pepl-stdlib.svg)](https://crates.io/crates/pepl-stdlib)
+[![docs.rs](https://docs.rs/pepl-stdlib/badge.svg)](https://docs.rs/pepl-stdlib)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 The PEPL standard library — deterministic, pure functions for PEPL programs.
